@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import MyDropzone from '../ModelDropZone';
+import ModelDropZone from '../ModelDropZone';
 import VectorMap from '../VectorMap';
 import './index.css';
 
 class App extends Component {
   render() {
     return (
-      <MyDropzone>
+      <ModelDropZone>
         <div className="App">
           <header className="App-header">
             <VectorMap />
@@ -14,7 +14,7 @@ class App extends Component {
           </header>
 
         </div>
-      </MyDropzone>
+      </ModelDropZone>
     );
   }
 }
