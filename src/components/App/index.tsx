@@ -1,28 +1,20 @@
 import React, { Component } from 'react';
-import MyDropzone from '../ModelDropZone';
+import ModelDropZone from '../ModelDropZone';
+import VectorMap from '../VectorMap';
 import './index.css';
 
 class App extends Component {
   render() {
     return (
-      <MyDropzone>
+      <ModelDropZone>
         <div className="App">
           <header className="App-header">
-            <p>
-              Edit <code>src/App.tsx</code> and save to reload.
-          </p>
+            <VectorMap />
 
-            <a
-              className="App-link"
-              href="https://reactjs.org"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learn React
-          </a>
           </header>
+
         </div>
-      </MyDropzone>
+      </ModelDropZone>
     );
   }
 }

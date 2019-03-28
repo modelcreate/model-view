@@ -38,7 +38,7 @@ interface Props {
   children: ReactNode;
 }
 
-function StyledDropzone(props: Props) {
+function ModelDropZone(props: Props) {
   const { children } = props
   const {
     acceptedFiles,
@@ -72,4 +72,4 @@ function StyledDropzone(props: Props) {
   );
 }
 
-export default StyledDropzone
+export default ModelDropZone
