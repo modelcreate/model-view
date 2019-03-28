@@ -34,6 +34,7 @@ export function reprojectFeature(feature: Feature, fromProject: string): Feature
 }
 
 export function reprojectCoord(coord: number[], fromProject: string): number[] {
+  //@ts-ignore
   return proj4(fromProject, proj4('EPSG:4326'), coord)
 }
 
