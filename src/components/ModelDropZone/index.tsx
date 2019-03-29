@@ -44,7 +44,16 @@ const ModelDropZone: FunctionComponent<CardProps> = ({ onDroppedJson, children }
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles[0] !== undefined) {
-      onDroppedJson(acceptedFiles[0])
+
+      const reader = new FileReader()
+      reader.onload = () => {
+        if (typeof reader.result === 'string') {
+          onDroppedJson(JSON.parse(reader.result))
+        }
+      }
+
+      reader.readAsText(acceptedFiles[0])
+
     }
   }, [])
 

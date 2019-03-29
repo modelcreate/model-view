@@ -3,10 +3,18 @@ import ModelDropZone from '../ModelDropZone';
 import VectorMap from '../VectorMap';
 import './index.css';
 
-class App extends Component {
+type AppState = {
+  modelGeoJson: object
+}
 
-  droppedJson = (files: File) => {
-    console.log(files)
+class App extends Component<{}, AppState> {
+
+
+  droppedJson = (file: object) => {
+
+    this.setState({
+      modelGeoJson: file
+    });
   }
   render() {
     return (
