@@ -1,5 +1,7 @@
-import React, { useMemo, ReactNode } from 'react';
+import React, { useMemo, useCallback, FunctionComponent } from 'react';
 import { useDropzone } from 'react-dropzone';
+import { FeatureCollection, Geometries, Properties } from '@turf/helpers';
+import { geojsonType } from '@turf/invariant';
 
 const overlayStyle = {
   position: "absolute",
@@ -34,19 +36,43 @@ const rejectStyle = {
   borderColor: '#ff1744'
 };
 
-interface Props {
-  children: ReactNode;
+
+type ModelDropZone = {
+  onDroppedJson: (file: FeatureCollection<Geometries, Properties>) => void;
 }
 
-function ModelDropZone(props: Props) {
-  const { children } = props
+
+const ModelDropZone: FunctionComponent<ModelDropZone> = ({ onDroppedJson, children }) => {
+
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    if (acceptedFiles[0] !== undefined) {
+
+      const reader = new FileReader()
+      reader.onload = () => {
+        if (typeof reader.result === 'string') {
+          const geoJson: FeatureCollection<Geometries, Properties> = JSON.parse(reader.result)
+          try {
+            geojsonType(geoJson, "FeatureCollection", "Drop Zone")
+            onDroppedJson(geoJson)
+          } catch (e) {
+            console.log(e);
+            // TODO: Handle if dropped bad JSON data 
+          }
+        }
+      }
+
+      reader.readAsText(acceptedFiles[0])
+
+    }
+  }, [])
+
   const {
     acceptedFiles,
     getRootProps,
     isDragActive,
     isDragAccept,
     isDragReject
-  } = useDropzone({ accept: 'application/json', multiple: false });
+  } = useDropzone({ accept: 'application/json', multiple: false, onDrop });
 
   const style = useMemo(() => ({
     ...baseStyle,
@@ -58,11 +84,10 @@ function ModelDropZone(props: Props) {
       isDragReject
     ]);
 
-  const files = acceptedFiles.map(file => (
-    <li key={file.name}>
-      {file.name} - {file.size} bytes
-      </li>
-  ));
+
+
+
+
 
   return (
     <div {...getRootProps({ style })}>

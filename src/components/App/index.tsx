@@ -2,15 +2,38 @@ import React, { Component } from 'react';
 import ModelDropZone from '../ModelDropZone';
 import VectorMap from '../VectorMap';
 import './index.css';
+import { FeatureCollection, Geometries, Properties } from '@turf/helpers';
 
-class App extends Component {
+type Props = {}
+
+
+interface AppState {
+  modelGeoJson?: FeatureCollection<Geometries, Properties>
+  isLoaded: boolean
+}
+
+
+class App extends Component<Props, AppState> {
+  state: Readonly<AppState> = {
+    isLoaded: false
+  };
+
+  droppedJson = (file: FeatureCollection<Geometries, Properties>) => {
+
+    this.setState({
+      modelGeoJson: file
+    });
+  }
   render() {
+    const { isLoaded, modelGeoJson } = this.state
+
     return (
-      <ModelDropZone>
+      <ModelDropZone onDroppedJson={this.droppedJson}>
         <div className="App">
           <header className="App-header">
-            <VectorMap />
-
+            {modelGeoJson &&
+              <VectorMap modelGeoJson={modelGeoJson} />
+            }
           </header>
 
         </div>
