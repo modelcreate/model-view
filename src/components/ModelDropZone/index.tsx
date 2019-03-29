@@ -1,4 +1,4 @@
-import React, { useMemo, ReactNode } from 'react';
+import React, { useMemo, useCallback, FunctionComponent } from 'react';
 import { useDropzone } from 'react-dropzone';
 
 const overlayStyle = {
@@ -34,19 +34,27 @@ const rejectStyle = {
   borderColor: '#ff1744'
 };
 
-interface Props {
-  children: ReactNode;
+
+type CardProps = {
+  onDroppedJson: (file: File) => void;
 }
 
-function ModelDropZone(props: Props) {
-  const { children } = props
+
+const ModelDropZone: FunctionComponent<CardProps> = ({ onDroppedJson, children }) => {
+
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    if (acceptedFiles[0] !== undefined) {
+      onDroppedJson(acceptedFiles[0])
+    }
+  }, [])
+
   const {
     acceptedFiles,
     getRootProps,
     isDragActive,
     isDragAccept,
     isDragReject
-  } = useDropzone({ accept: 'application/json', multiple: false });
+  } = useDropzone({ accept: 'application/json', multiple: false, onDrop });
 
   const style = useMemo(() => ({
     ...baseStyle,
@@ -58,11 +66,10 @@ function ModelDropZone(props: Props) {
       isDragReject
     ]);
 
-  const files = acceptedFiles.map(file => (
-    <li key={file.name}>
-      {file.name} - {file.size} bytes
-      </li>
-  ));
+
+
+
+
 
   return (
     <div {...getRootProps({ style })}>
