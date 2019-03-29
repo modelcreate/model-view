@@ -2,13 +2,13 @@ import React, { Component } from 'react';
 import ModelDropZone from '../ModelDropZone';
 import VectorMap from '../VectorMap';
 import './index.css';
-import { FeatureCollection } from '@turf/helpers';
+import { FeatureCollection, Geometries, Properties } from '@turf/helpers';
 
 type Props = {}
 
 
 interface AppState {
-  modelGeoJson?: object
+  modelGeoJson?: FeatureCollection<Geometries, Properties>
   isLoaded: boolean
 }
 
@@ -18,7 +18,7 @@ class App extends Component<Props, AppState> {
     isLoaded: false
   };
 
-  droppedJson = (file: FeatureCollection) => {
+  droppedJson = (file: FeatureCollection<Geometries, Properties>) => {
 
     this.setState({
       modelGeoJson: file
