@@ -35,7 +35,7 @@ const paint = {
 
 
 const HydrantStyle = fromJS({
-  id: 'data',
+  id: 'hydrants-geojson',
   source: 'hydrants',
   type: 'circle',
   paint,

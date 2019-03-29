@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import ReactMapGL from 'react-map-gl';
 import { fromJS } from 'immutable';
-import { OsZoomStackLight, HydrantStyle } from '../../mapstyles'
+import { OsZoomStackLight, HydrantStyle, MainStyle } from '../../mapstyles'
 import { reprojectFeatureCollection } from '../../utils/reproject'
 import { FeatureCollection, Geometries, Properties, featureCollection } from '@turf/helpers';
 
@@ -26,24 +26,28 @@ class VectorMap extends Component<VectorMapProps> {
     const fromProjection = '+proj=tmerc +lat_0=49 +lon_0=-2 +k=0.9996012717 +x_0=400000 +y_0=-100000 +ellps=airy +towgs84=375,-111,431,0,0,0,0 +units=m +no_defs'
     const geoJson = reprojectFeatureCollection(this.props.modelGeoJson, fromProjection)
     console.log(geoJson)
-    const data = extractAssetType(geoJson, 'wn_hydrant')
-    console.log(data)
+    const wn_hydrant = extractAssetType(geoJson, 'wn_hydrant')
+    const wn_pipe = extractAssetType(geoJson, 'wn_pipe')
+
     const immutBase = fromJS(OsZoomStackLight)
     const mapStyle = immutBase
-      // Add geojson source to map
-      .setIn(['sources', 'hydrants'], fromJS({ type: 'geojson', data }))
-      // Add point layer to map
-      .set('layers', immutBase.get('layers').push(HydrantStyle));
+      .setIn(['sources', 'hydrants'], fromJS({ type: 'geojson', data: wn_hydrant }))
+      .setIn(['sources', 'mains'], fromJS({ type: 'geojson', data: wn_pipe }))
+      .set('layers', immutBase.get('layers').push(MainStyle).push(HydrantStyle))
+
+
+    console.log(mapStyle.toJS())
+
     return mapStyle
   }
 
   state = {
     viewport: {
-      width: 500,
-      height: 400,
-      latitude: -2,
-      longitude: 50,
-      zoom: 0
+      width: '100%',
+      height: '100vh',
+      latitude: 56.83955911423721,
+      longitude: -2.287646619512958,
+      zoom: 10
     },
     mapStyle: this._createStyles()
   };
