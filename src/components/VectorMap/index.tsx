@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import ReactMapGL from 'react-map-gl';
 import { fromJS } from 'immutable';
-import { OsZoomStackLight, HydrantStyle, MainStyle } from '../../mapstyles'
+import { OsZoomStackLight, HydrantStyle, MainStyle, MeterStyle } from '../../mapstyles'
 import { reprojectFeatureCollection } from '../../utils/reproject'
 import { FeatureCollection, Geometries, Properties, featureCollection } from '@turf/helpers';
 
@@ -22,18 +22,36 @@ const extractAssetType = (geoJson: FeatureCollection, type: string) => {
 
 class VectorMap extends Component<VectorMapProps> {
 
+  _map: mapboxgl.Map | null = null
+
+  _addImage = () => {
+    if (this._map !== null) {
+      this._map.addImage('meter', MeterStyle.toJS().images[0][1])
+      console.log(MeterStyle.toJS().images[0][1])
+    }
+  }
+
   _createStyles = () => {
+
+
+
     const fromProjection = '+proj=tmerc +lat_0=49 +lon_0=-2 +k=0.9996012717 +x_0=400000 +y_0=-100000 +ellps=airy +towgs84=375,-111,431,0,0,0,0 +units=m +no_defs'
     const geoJson = reprojectFeatureCollection(this.props.modelGeoJson, fromProjection)
     console.log(geoJson)
     const wn_hydrant = extractAssetType(geoJson, 'wn_hydrant')
     const wn_pipe = extractAssetType(geoJson, 'wn_pipe')
+    const wn_meter = extractAssetType(geoJson, 'wn_meter')
 
     const immutBase = fromJS(OsZoomStackLight)
     const mapStyle = immutBase
       .setIn(['sources', 'hydrants'], fromJS({ type: 'geojson', data: wn_hydrant }))
       .setIn(['sources', 'mains'], fromJS({ type: 'geojson', data: wn_pipe }))
-      .set('layers', immutBase.get('layers').push(MainStyle).push(HydrantStyle))
+      .setIn(['sources', 'meters'], fromJS({ type: 'geojson', data: wn_meter }))
+      .set('layers', immutBase.get('layers')
+        .push(MainStyle)
+        .push(HydrantStyle)
+        .push(MeterStyle)
+      )
 
 
     console.log(mapStyle.toJS())
@@ -64,7 +82,13 @@ class VectorMap extends Component<VectorMapProps> {
         mapboxApiAccessToken={MAPBOX_TOKEN}
         {...this.state.viewport}
         mapStyle={mapStyle}
+        ref={ref => {
+          if (ref && ref.getMap()) {
+            this._map = ref.getMap()
+          }
+        }}
         onViewportChange={(viewport) => this.setState({ viewport })}
+        onLoad={() => { this._addImage() }}
       />
     );
   }
