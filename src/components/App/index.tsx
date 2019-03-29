@@ -3,12 +3,19 @@ import ModelDropZone from '../ModelDropZone';
 import VectorMap from '../VectorMap';
 import './index.css';
 
-type AppState = {
-  modelGeoJson: object
+type Props = {}
+
+
+interface AppState {
+  modelGeoJson?: object
+  isLoaded: boolean
 }
 
-class App extends Component<{}, AppState> {
 
+class App extends Component<Props, AppState> {
+  state: Readonly<AppState> = {
+    isLoaded: false
+  };
 
   droppedJson = (file: object) => {
 
@@ -17,12 +24,15 @@ class App extends Component<{}, AppState> {
     });
   }
   render() {
+    const { isLoaded, modelGeoJson } = this.state
+
     return (
       <ModelDropZone onDroppedJson={this.droppedJson}>
         <div className="App">
           <header className="App-header">
-            <VectorMap />
-
+            {modelGeoJson &&
+              <VectorMap modelGeoJson={modelGeoJson} />
+            }
           </header>
 
         </div>

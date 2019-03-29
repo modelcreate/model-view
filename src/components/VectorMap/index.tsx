@@ -3,8 +3,12 @@ import ReactMapGL from 'react-map-gl';
 
 const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 
+type VectorMapProps = {
+  modelGeoJson: object
+}
 
-class VectorMap extends Component {
+class VectorMap extends Component<VectorMapProps> {
+
 
   state = {
     viewport: {
@@ -15,6 +19,8 @@ class VectorMap extends Component {
       zoom: 0
     }
   };
+
+
 
   render() {
     return (

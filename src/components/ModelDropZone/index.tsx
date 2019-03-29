@@ -35,12 +35,12 @@ const rejectStyle = {
 };
 
 
-type CardProps = {
+type ModelDropZone = {
   onDroppedJson: (file: File) => void;
 }
 
 
-const ModelDropZone: FunctionComponent<CardProps> = ({ onDroppedJson, children }) => {
+const ModelDropZone: FunctionComponent<ModelDropZone> = ({ onDroppedJson, children }) => {
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles[0] !== undefined) {
