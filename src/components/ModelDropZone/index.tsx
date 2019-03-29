@@ -1,5 +1,7 @@
 import React, { useMemo, useCallback, FunctionComponent } from 'react';
 import { useDropzone } from 'react-dropzone';
+import { FeatureCollection } from '@turf/helpers';
+import { geojsonType } from '@turf/invariant';
 
 const overlayStyle = {
   position: "absolute",
@@ -36,7 +38,7 @@ const rejectStyle = {
 
 
 type ModelDropZone = {
-  onDroppedJson: (file: File) => void;
+  onDroppedJson: (file: FeatureCollection) => void;
 }
 
 
@@ -48,7 +50,14 @@ const ModelDropZone: FunctionComponent<ModelDropZone> = ({ onDroppedJson, childr
       const reader = new FileReader()
       reader.onload = () => {
         if (typeof reader.result === 'string') {
-          onDroppedJson(JSON.parse(reader.result))
+          const geoJson: FeatureCollection = JSON.parse(reader.result)
+          try {
+            geojsonType(geoJson, "FeatureCollection", "Drop Zone")
+            onDroppedJson(geoJson)
+          } catch (e) {
+            console.log(e);
+            // TODO: Handle if dropped bad JSON data 
+          }
         }
       }
 
