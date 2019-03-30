@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import ReactMapGL from 'react-map-gl';
+import ReactMapGL, { PointerEvent } from 'react-map-gl';
 import { fromJS } from 'immutable';
 import { OsZoomStackLight, HydrantStyle, MainStyle, MeterStyle, ValveStyle } from '../../mapstyles'
 import { reprojectFeatureCollection } from '../../utils/reproject'
 import { FeatureCollection, Geometries, Properties, featureCollection } from '@turf/helpers';
+import { MapboxEvent } from 'mapbox-gl';
 
 
 const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
@@ -11,16 +12,35 @@ const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 type VectorMapProps = {
   modelGeoJson: FeatureCollection<Geometries, Properties>
 }
+interface VectorMapState {
+  modelGeoJson?: FeatureCollection<Geometries, Properties>
+  mapStyle?: any,
+  viewport: any,
+  x?: number,
+  y?: number,
+  hoveredFeature?: any
+}
 
-
-
+//state = {
+//  viewport: {
+//    width: '100%',
+//    height: '100vh',
+//    latitude: 56.83955911423721,
+//    longitude: -2.287646619512958,
+//    zoom: 10
+//  },
+//  mapStyle: Any,
+//  x: 0,
+//  y: 0
+//};
 
 const extractAssetType = (geoJson: FeatureCollection, types: string[]) => {
   const filteredFeatures = geoJson.features.filter(feature => feature.properties !== null && types.includes(feature.properties.table));
   return featureCollection(filteredFeatures)
 }
 
-class VectorMap extends Component<VectorMapProps> {
+class VectorMap extends Component<VectorMapProps, VectorMapState> {
+
 
   _map: mapboxgl.Map | null = null
 
@@ -63,7 +83,7 @@ class VectorMap extends Component<VectorMapProps> {
     return mapStyle
   }
 
-  state = {
+  state: Readonly<VectorMapState> = {
     viewport: {
       width: '100%',
       height: '100vh',
@@ -73,6 +93,26 @@ class VectorMap extends Component<VectorMapProps> {
     },
     mapStyle: this._createStyles()
   };
+
+  _onHover = (event: PointerEvent) => {
+    const { features, srcEvent: { offsetX, offsetY } } = event;
+    const hoveredFeature = features && features.find(f => f.layer.id === 'hydrants-geojson');
+    this.setState({ hoveredFeature, x: offsetX, y: offsetY });
+  };
+
+  _renderTooltip() {
+    const { hoveredFeature, x, y } = this.state;
+
+    return hoveredFeature && (
+      <div className="tooltip" style={{ left: x, top: y }}>
+        <div>State: {hoveredFeature.properties.name}</div>
+        <div>Median Household Income: {hoveredFeature.properties.value}</div>
+        <div>Percentile: {hoveredFeature.properties.percentile / 8 * 100}</div>
+      </div>
+    );
+  }
+
+
 
 
 
@@ -93,7 +133,10 @@ class VectorMap extends Component<VectorMapProps> {
         }}
         onViewportChange={(viewport) => this.setState({ viewport })}
         onLoad={() => { this._addImage() }}
-      />
+        onHover={this._onHover}
+      >
+        {this._renderTooltip()}
+      </ReactMapGL>
     );
   }
 }
