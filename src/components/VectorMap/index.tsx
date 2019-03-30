@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import ReactMapGL, { PointerEvent } from 'react-map-gl';
+import ReactMapGL, { PointerEvent, ExtraState } from 'react-map-gl';
 import { fromJS } from 'immutable';
 import { OsZoomStackLight, HydrantStyle, MainStyle, MeterStyle, ValveStyle } from '../../mapstyles'
 import { reprojectFeatureCollection } from '../../utils/reproject'
@@ -18,7 +18,8 @@ interface VectorMapState {
   viewport: any,
   x?: number,
   y?: number,
-  hoveredFeature?: any
+  hoveredFeature?: any,
+  interactiveLayerIds: string[]
 }
 
 //state = {
@@ -43,6 +44,8 @@ class VectorMap extends Component<VectorMapProps, VectorMapState> {
 
 
   _map: mapboxgl.Map | null = null
+
+
 
   _addImage = () => {
     if (this._map !== null) {
@@ -91,7 +94,8 @@ class VectorMap extends Component<VectorMapProps, VectorMapState> {
       longitude: -2.287646619512958,
       zoom: 10
     },
-    mapStyle: this._createStyles()
+    mapStyle: this._createStyles(),
+    interactiveLayerIds: ['hydrants-geojson', 'main-geojson']
   };
 
   _onHover = (event: PointerEvent) => {
@@ -111,6 +115,19 @@ class VectorMap extends Component<VectorMapProps, VectorMapState> {
       </div>
     );
   }
+
+  _getCursor = (event: ExtraState) => {
+    return event.isHovering ? 'pointer' : 'default';
+  };
+
+  _onClick = (event: PointerEvent) => {
+    const feature = event.features && event.features[0];
+
+    if (feature) {
+      console.log(feature)
+      window.alert(`Clicked layer ${feature.layer.id}`);
+    }
+  };
 
 
 
@@ -134,6 +151,10 @@ class VectorMap extends Component<VectorMapProps, VectorMapState> {
         onViewportChange={(viewport) => this.setState({ viewport })}
         onLoad={() => { this._addImage() }}
         onHover={this._onHover}
+        onClick={this._onClick}
+        getCursor={this._getCursor}
+        interactiveLayerIds={this.state.interactiveLayerIds}
+        clickRadius={2}
       >
         {this._renderTooltip()}
       </ReactMapGL>
