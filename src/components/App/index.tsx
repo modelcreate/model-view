@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import ModelDropZone from '../ModelDropZone';
 import VectorMap from '../VectorMap';
 import './index.css';
+import 'mapbox-gl/dist/mapbox-gl.css';
 import { FeatureCollection, Geometries, Properties } from '@turf/helpers';
 
 type Props = {}
