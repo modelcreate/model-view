@@ -1,0 +1,31 @@
+.control-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  max-width: 320px;
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  padding: 12px 24px;
+  margin: 20px;
+  font-size: 13px;
+  line-height: 2;
+  color: #6b6b76;
+  text-transform: uppercase;
+  outline: none;
+}
+
+.control-panel h3 {
+  font-size: 1.2em;
+  font-weight: 500;
+  margin: 8px 0;
+}
+
+.control-panel p {
+  margin-bottom: 16px;
+}
+
+hr {
+  border: none;
+  background: #ededed;
+  height: 1px;
+}
