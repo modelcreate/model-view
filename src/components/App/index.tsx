@@ -4,7 +4,7 @@ import VectorMap from '../VectorMap';
 import ModelInfo, { ModelInfoSetting, testFeature } from '../ModelInfo';
 import './index.css';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { FeatureCollection, Geometries, Properties } from '@turf/helpers';
+import { FeatureCollection, Geometries, Properties, Feature } from '@turf/helpers';
 
 
 const setting: ModelInfoSetting = {
@@ -46,6 +46,20 @@ class App extends Component<Props, AppState> {
 
   };
 
+  _updateSelectedFeature = (value: Feature) => {
+
+    if (value.properties !== null) {
+      const selectedFeature: { [name: string]: any; } = value.properties
+      this.setState(prevState => ({
+        setting: {
+          ...prevState.setting,
+          selectedFeature
+        }
+      }))
+    }
+
+  };
+
 
   render() {
     const { isLoaded, modelGeoJson, setting } = this.state
@@ -54,10 +68,11 @@ class App extends Component<Props, AppState> {
       <ModelDropZone onDroppedJson={this.droppedJson}>
         <div className="App">
           <header className="App-header">
-            <ModelInfo settings={setting} onChange={this._updateSettings} />
+
             {modelGeoJson &&
               <>
-                <VectorMap modelGeoJson={modelGeoJson} />
+                <VectorMap onSelectFeature={this._updateSelectedFeature} modelGeoJson={modelGeoJson} />
+                <ModelInfo settings={setting} onChange={this._updateSettings} />
 
               </>
             }
