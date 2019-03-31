@@ -13,18 +13,26 @@ type TimeSeriesChartProps = {
 
 const TimeSeriesChart: FunctionComponent<TimeSeriesChartProps> = ({ timeseriesData, timesteps, currentTimestep }) => {
 
+  const avgData = timeseriesData.reduce((p, c) => p + c, 0) / timeseriesData.length;
+  const multipler = avgData >= 0 ? 1 : -1
 
-  const data = timesteps.map((timestep, i) => ({ "x": timestep, "y": timeseriesData[i] }))
+  const data = timesteps.map((timestep, i) => ({ "x": timestep, "y": timeseriesData[i] * multipler }))
+  const max = Math.max(...timeseriesData)
+  const min = Math.min(...timeseriesData)
+  const domainMax = Math.max(Math.abs(max), Math.abs(min))
 
   return (
     <div>
-      <VictoryChart width={500} height={200} scale={{ x: "time" }}
+      <VictoryChart domain={{ y: [0, domainMax] }} width={500} height={180} scale={{ x: "time" }}
       >
         <VictoryLine style={{
           data: { stroke: "tomato" }
         }} x={() => timesteps[currentTimestep].getTime()} />
         <VictoryLine
           data={data}
+          style={{
+            data: { stroke: "#1528f7" }
+          }}
 
         />
       </VictoryChart>

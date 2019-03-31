@@ -1,0 +1,20 @@
+.tvd-form {
+  display: table;
+    width: 100%;
+    text-align: center;
+}
+
+.tvd-form  label {
+  width: 1px;
+  white-space: nowrap;
+  padding-right: 5px;
+}
+
+.tvd-form select {
+  display: table-cell;
+  padding: 0 0 0 5px;
+}
+
+.feature-data-table {
+  text-align: left;
+}

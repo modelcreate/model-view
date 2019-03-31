@@ -1,6 +1,7 @@
 import React, { PureComponent, FunctionComponent } from 'react';
 import { Properties } from '@turf/helpers';
 import FeatureProperties from '../FeatureProperties';
+import format from 'date-fns/format'
 import './index.css';
 
 
@@ -35,16 +36,21 @@ const ModelInfo: FunctionComponent<ModelInfoProps> = ({ settings, onChange }) =>
 
   return (
     <DefaultContainer>
-      <h3>{settings.modeName}</h3>
-      <p>{settings.timesteps[settings.currentTimestep].toLocaleDateString('en-UK', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
-      <p>{settings.timesteps[settings.currentTimestep].toLocaleTimeString('en-UK')}</p>
-      <hr />
-      <div key={name} className="input">
-        <label>Year {settings.selectedFeature && settings.selectedFeature.length}</label>
-        <input type="range" value={settings.currentTimestep}
-          min={0} max={settings.timesteps.length - 1} step={1}
-          onChange={evt => onChange(evt.target.value)}
-        />
+      <div>
+        <h2>{format(
+          settings.timesteps[settings.currentTimestep],
+          'Do MMMM YY'
+        )}</h2>
+        <h1>{format(
+          settings.timesteps[settings.currentTimestep],
+          'HH:mm'
+        )}</h1>
+        <div key={name} className="input">
+          <input type="range" value={settings.currentTimestep}
+            min={0} max={settings.timesteps.length - 1} step={1}
+            onChange={evt => onChange(evt.target.value)}
+          />
+        </div>
       </div>
       <hr />
       {settings.selectedFeature &&

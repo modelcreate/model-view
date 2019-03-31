@@ -23,18 +23,7 @@ interface VectorMapState {
   interactiveLayerIds: string[]
 }
 
-//state = {
-//  viewport: {
-//    width: '100%',
-//    height: '100vh',
-//    latitude: 56.83955911423721,
-//    longitude: -2.287646619512958,
-//    zoom: 10
-//  },
-//  mapStyle: Any,
-//  x: 0,
-//  y: 0
-//};
+
 
 const extractAssetType = (geoJson: FeatureCollection, types: string[]) => {
   const filteredFeatures = geoJson.features.filter(feature => feature.properties !== null && types.includes(feature.properties.table));
@@ -89,8 +78,6 @@ class VectorMap extends Component<VectorMapProps, VectorMapState> {
 
   state: Readonly<VectorMapState> = {
     viewport: {
-      width: '100%',
-      height: '100vh',
       latitude: 56.83955911423721,
       longitude: -2.287646619512958,
       zoom: 10
@@ -167,9 +154,11 @@ class VectorMap extends Component<VectorMapProps, VectorMapState> {
         }}
         onViewportChange={(viewport) => this.setState({ viewport })}
         onLoad={() => { this._addImage() }}
-        onHover={this._onHover}
+        //onHover={this._onHover}
         onClick={this._onClick}
         getCursor={this._getCursor}
+        width="100%"
+        height="100vh"
         interactiveLayerIds={this.state.interactiveLayerIds}
         clickRadius={2}
       >
