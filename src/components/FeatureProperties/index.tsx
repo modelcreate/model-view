@@ -30,9 +30,12 @@ const FeatureProperties: FunctionComponent<FeatureProperties> = ({ feature, tsv 
       }
       <ul>
         {Object.keys(selectedFeature).map((keyName, i) => (
-          selectedFeature[keyName].constructor !== Array &&
           <li key={i}>
-            <span >key: {i} Name: {selectedFeature[keyName]}</span>
+            {(selectedFeature[keyName].constructor !== Array) ?
+              <span>{keyName}: {selectedFeature[keyName]}</span>
+              :
+              <span>{keyName}: {selectedFeature[keyName][feature.currentTimestep]}</span>
+            }
           </li>
         ))}
       </ul>
