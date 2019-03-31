@@ -4,10 +4,11 @@ import FeatureProperties from '../FeatureProperties';
 import './index.css';
 
 
-export const testFeature: Properties = {
+export const testFeature = {
 
   "table": "wn_meter", "us_node_id": "12345", "ds_node_id": "67899", "link_suffix": "1",
-  "flow": [3.969326972961426, 3.6261651515960693, 3.0963973999023438, 2.7438931465148926]
+  "flow": [3.969326972961426, 3.6261651515960693, 3.0963973999023438, 2.7438931465148926],
+  "velcity": [4, 5, 4.2, 6]
 
 }
 
@@ -20,7 +21,7 @@ export interface ModelInfoSetting {
   modeName: string,
   currentTimestep: number,
   timesteps: Date[],
-  selectedFeature: Properties
+  selectedFeature: { [name: string]: any; }
 }
 
 
@@ -47,7 +48,7 @@ const ModelInfo: FunctionComponent<ModelInfoProps> = ({ settings, onChange }) =>
       </div>
       <hr />
       {settings.selectedFeature &&
-        <FeatureProperties feature={settings.selectedFeature} />
+        <FeatureProperties feature={settings} />
       }
 
 

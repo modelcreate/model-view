@@ -1,22 +1,25 @@
 import React, { FunctionComponent } from 'react';
 import TimeSeriesChart from '../TimeSeriesChart';
 import { Properties } from '@turf/helpers';
+import { ModelInfoSetting } from '../ModelInfo';
 
 type FeatureProperties = {
-  feature: Properties
+  feature: ModelInfoSetting
 }
 
 
 const FeatureProperties: FunctionComponent<FeatureProperties> = ({ feature }) => {
 
+  const { selectedFeature } = feature
+
   return (
     <div>
-      <TimeSeriesChart />
+      <TimeSeriesChart settings={feature} />
       <ul>
-        {feature && Object.keys(feature).map((keyName, i) => (
-          feature[keyName].constructor !== Array &&
+        {Object.keys(selectedFeature).map((keyName, i) => (
+          selectedFeature[keyName].constructor !== Array &&
           <li key={i}>
-            <span >key: {i} Name: {feature && feature[keyName]}</span>
+            <span >key: {i} Name: {selectedFeature[keyName]}</span>
           </li>
         ))}
       </ul>
