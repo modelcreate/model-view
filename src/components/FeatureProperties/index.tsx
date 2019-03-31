@@ -3,6 +3,7 @@ import TimeSeriesChart from '../TimeSeriesChart';
 import { Properties } from '@turf/helpers';
 import { ModelInfoSetting } from '../ModelInfo';
 import { debug } from 'util';
+import './index.css';
 
 type FeatureProperties = {
   feature: ModelInfoSetting,
@@ -19,15 +20,18 @@ const FeatureProperties: FunctionComponent<FeatureProperties> = ({ feature, tsv 
 
   return (
     <div>
-      <select id="timeseries-select" value={timeSeriesId} onChange={evt => setTimeSeriesId(evt.target.value)}>
-        {tsv.map((keyName) => (
-          <option key={keyName} value={keyName}>{keyName}</option>
-        ))}
-      </select>
       {
 
         <TimeSeriesChart timeseriesData={selectedFeature[timeSeriesId]} currentTimestep={feature.currentTimestep} timesteps={feature.timesteps} />
       }
+      <form className="tvd-form">
+        <label>Plot Data: </label>
+        <select id="timeseries-select" value={timeSeriesId} onChange={evt => setTimeSeriesId(evt.target.value)}>
+          {tsv.map((keyName) => (
+            <option key={keyName} value={keyName}>{keyName}</option>
+          ))}
+        </select>
+      </form>
       <ul>
         {Object.keys(selectedFeature).map((keyName, i) => (
           <li key={i}>

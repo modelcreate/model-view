@@ -13,8 +13,10 @@ type TimeSeriesChartProps = {
 
 const TimeSeriesChart: FunctionComponent<TimeSeriesChartProps> = ({ timeseriesData, timesteps, currentTimestep }) => {
 
+  const avgData = timeseriesData.reduce((p, c) => p + c, 0) / timeseriesData.length;
+  const multipler = avgData >= 0 ? 1 : -1
 
-  const data = timesteps.map((timestep, i) => ({ "x": timestep, "y": timeseriesData[i] }))
+  const data = timesteps.map((timestep, i) => ({ "x": timestep, "y": timeseriesData[i] * multipler }))
 
   return (
     <div>
