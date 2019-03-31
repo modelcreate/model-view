@@ -14,3 +14,7 @@
   display: table-cell;
   padding: 0 0 0 5px;
 }
+
+.feature-data-table {
+  text-align: left;
+}

@@ -74,11 +74,11 @@ class App extends Component<Props, AppState> {
       <ModelDropZone onDroppedJson={this.droppedJson}>
         <div className="App">
           <header className="App-header">
-            <ModelInfo settings={setting} onChange={this._updateSettings} />
 
             {modelGeoJson &&
               <>
                 <VectorMap onSelectFeature={this._updateSelectedFeature} modelGeoJson={modelGeoJson} />
+                <ModelInfo settings={setting} onChange={this._updateSettings} />
 
 
               </>

@@ -32,16 +32,21 @@ const FeatureProperties: FunctionComponent<FeatureProperties> = ({ feature, tsv 
           ))}
         </select>
       </form>
+      <table className="feature-data-table">
+        <tbody>
+          {Object.keys(selectedFeature).map((keyName, i) => (
+            <tr key={i}>
+              {(selectedFeature[keyName].constructor !== Array) ?
+                <><th>{keyName}</th><td>{selectedFeature[keyName]}</td></>
+                :
+                <><th>{keyName}</th><td>{selectedFeature[keyName][feature.currentTimestep]}</td></>
+              }
+            </tr>
+          ))}
+        </tbody>
+      </table>
       <ul>
-        {Object.keys(selectedFeature).map((keyName, i) => (
-          <li key={i}>
-            {(selectedFeature[keyName].constructor !== Array) ?
-              <span>{keyName}: {selectedFeature[keyName]}</span>
-              :
-              <span>{keyName}: {selectedFeature[keyName][feature.currentTimestep]}</span>
-            }
-          </li>
-        ))}
+
       </ul>
     </div>
 
