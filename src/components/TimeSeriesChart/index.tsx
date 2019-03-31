@@ -1,36 +1,30 @@
 import React, { FunctionComponent, useState } from 'react';
 import { VictoryChart, VictoryLine } from 'victory';
 import { ModelInfoSetting } from '../ModelInfo';
+import { debug } from 'util';
 
 
 type TimeSeriesChartProps = {
-  settings: ModelInfoSetting
+  timeseriesData: number[],
+  timesteps: Date[],
+  currentTimestep: number
 }
 
 
-const TimeSeriesChart: FunctionComponent<TimeSeriesChartProps> = ({ settings }) => {
+const TimeSeriesChart: FunctionComponent<TimeSeriesChartProps> = ({ timeseriesData, timesteps, currentTimestep }) => {
 
-  const { selectedFeature } = settings
-  const selectId = Object.keys(selectedFeature).find(key => selectedFeature[key].constructor === Array)
 
-  const [dataId, setDataId] = useState(selectId);
-
+  const data = timesteps.map((timestep, i) => ({ "x": timestep, "y": timeseriesData[i] }))
 
   return (
     <div>
-      <select id="timeseries-select" value={dataId} onChange={evt => setDataId(evt.target.value)}>
-        {Object.keys(selectedFeature).map((keyName, i) => (
-          selectedFeature[keyName].constructor === Array &&
-          <option key={keyName} value={keyName}>{keyName}</option>
-        ))}
-      </select>
       <VictoryChart width={500} height={200} scale={{ x: "time" }}
       >
         <VictoryLine style={{
           data: { stroke: "tomato" }
-        }} x={() => settings.timesteps[settings.currentTimestep].getTime()} />
+        }} x={() => timesteps[currentTimestep].getTime()} />
         <VictoryLine
-          data={dataId && settings.timesteps.map((timestep, i) => ({ "x": timestep, "y": selectedFeature[dataId][i] })) || []}
+          data={data}
 
         />
       </VictoryChart>
