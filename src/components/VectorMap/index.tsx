@@ -154,7 +154,7 @@ class VectorMap extends Component<VectorMapProps, VectorMapState> {
         }}
         onViewportChange={(viewport) => this.setState({ viewport })}
         onLoad={() => { this._addImage() }}
-        onHover={this._onHover}
+        //onHover={this._onHover}
         onClick={this._onClick}
         getCursor={this._getCursor}
         width="100%"

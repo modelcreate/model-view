@@ -36,19 +36,21 @@ const ModelInfo: FunctionComponent<ModelInfoProps> = ({ settings, onChange }) =>
 
   return (
     <DefaultContainer>
-      <h2>{format(
-        settings.timesteps[settings.currentTimestep],
-        'Do MMMM YY'
-      )}</h2>
-      <h1>{format(
-        settings.timesteps[settings.currentTimestep],
-        'HH:mm'
-      )}</h1>
-      <div key={name} className="input">
-        <input type="range" value={settings.currentTimestep}
-          min={0} max={settings.timesteps.length - 1} step={1}
-          onChange={evt => onChange(evt.target.value)}
-        />
+      <div>
+        <h2>{format(
+          settings.timesteps[settings.currentTimestep],
+          'Do MMMM YY'
+        )}</h2>
+        <h1>{format(
+          settings.timesteps[settings.currentTimestep],
+          'HH:mm'
+        )}</h1>
+        <div key={name} className="input">
+          <input type="range" value={settings.currentTimestep}
+            min={0} max={settings.timesteps.length - 1} step={1}
+            onChange={evt => onChange(evt.target.value)}
+          />
+        </div>
       </div>
       <hr />
       {settings.selectedFeature &&

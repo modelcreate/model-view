@@ -17,6 +17,11 @@ const FeatureProperties: FunctionComponent<FeatureProperties> = ({ feature, tsv 
   //const selectId = Object.keys(selectedFeature).find(key => selectedFeature[key].constructor === Array)
   const [timeSeriesId, setTimeSeriesId] = useState(tsv[0])
 
+  const precise = (x: number): string => {
+    return x < 0 ? x.toPrecision(2) : x.toFixed(2).toString()
+
+  }
+
 
   return (
     <div>
@@ -32,22 +37,21 @@ const FeatureProperties: FunctionComponent<FeatureProperties> = ({ feature, tsv 
           ))}
         </select>
       </form>
-      <table className="feature-data-table">
-        <tbody>
-          {Object.keys(selectedFeature).map((keyName, i) => (
-            <tr key={i}>
-              {(selectedFeature[keyName].constructor !== Array) ?
-                <><th>{keyName}</th><td>{selectedFeature[keyName]}</td></>
-                :
-                <><th>{keyName}</th><td>{selectedFeature[keyName][feature.currentTimestep]}</td></>
-              }
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <ul>
-
-      </ul>
+      <div className="control-panel-data">
+        <table className="feature-data-table">
+          <tbody>
+            {Object.keys(selectedFeature).map((keyName, i) => (
+              <tr key={i}>
+                {(selectedFeature[keyName].constructor !== Array) ?
+                  <><th>{keyName}</th><td>{selectedFeature[keyName]}</td></>
+                  :
+                  <><th>{keyName}</th><td>{precise(selectedFeature[keyName][feature.currentTimestep])}</td></>
+                }
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
 
   )
