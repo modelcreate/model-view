@@ -10,6 +10,7 @@
     "@types/react": "16.8.10",
     "@types/react-dom": "16.8.3",
     "@types/react-map-gl": "^4.1.1",
+    "@types/victory": "^31.0.14",
     "deck.gl": "^6.4.8",
     "immutable": "^4.0.0-rc.12",
     "proj4": "^2.5.0",
@@ -18,7 +19,8 @@
     "react-dropzone": "^10.0.6",
     "react-map-gl": "^4.1.1",
     "react-scripts": "2.1.8",
-    "typescript": "3.3.4000"
+    "typescript": "3.3.4000",
+    "victory": "^32.1.0"
   },
   "scripts": {
     "start": "react-scripts start",

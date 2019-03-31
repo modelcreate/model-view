@@ -3,14 +3,15 @@ import ReactMapGL, { PointerEvent, ExtraState } from 'react-map-gl';
 import { fromJS } from 'immutable';
 import { OsZoomStackLight, HydrantStyle, MainStyle, MeterStyle, ValveStyle } from '../../mapstyles'
 import { reprojectFeatureCollection } from '../../utils/reproject'
-import { FeatureCollection, Geometries, Properties, featureCollection } from '@turf/helpers';
+import { FeatureCollection, Feature, Geometries, Properties, featureCollection } from '@turf/helpers';
 import { MapboxEvent } from 'mapbox-gl';
 
 
 const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 
 type VectorMapProps = {
-  modelGeoJson: FeatureCollection<Geometries, Properties>
+  modelGeoJson: FeatureCollection<Geometries, Properties>,
+  onSelectFeature: (value: Feature) => void;
 }
 interface VectorMapState {
   modelGeoJson?: FeatureCollection<Geometries, Properties>
@@ -120,13 +121,29 @@ class VectorMap extends Component<VectorMapProps, VectorMapState> {
     return event.isHovering ? 'pointer' : 'default';
   };
 
+  //TODO: This is a mess, I need to clean this up, there is probably an easy oneliner here I'm not thinking of
   _onClick = (event: PointerEvent) => {
     const feature = event.features && event.features[0];
 
     if (feature) {
-      console.log(feature)
-      window.alert(`Clicked layer ${feature.layer.id}`);
+
+      const { us_node_id, ds_node_id, link_suffix, node_id } = feature.properties
+      const feat = this.props.modelGeoJson.features.find(f => {
+        if (f.properties !== null) {
+          if (f.properties.us_node_id !== undefined) {
+            return f.properties.us_node_id === us_node_id && f.properties.ds_node_id === ds_node_id && f.properties.link_suffix === link_suffix
+          } else {
+            return f.properties.node_id === node_id
+          }
+        }
+        else return false
+      })
+
+      feat && this.props.onSelectFeature(feat)
+
     }
+
+
   };
 
 
