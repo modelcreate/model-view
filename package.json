@@ -2,6 +2,7 @@
   "name": "model-view",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://modelview.matrado.ca",
   "dependencies": {
     "@turf/turf": "^5.1.6",
     "@types/jest": "24.0.11",
@@ -13,6 +14,7 @@
     "@types/victory": "^31.0.14",
     "date-fns": "^1.30.1",
     "deck.gl": "^6.4.8",
+    "gh-pages": "^2.0.1",
     "immutable": "^4.0.0-rc.12",
     "proj4": "^2.5.0",
     "react": "^16.8.6",
@@ -24,6 +26,8 @@
     "victory": "^32.1.0"
   },
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
