@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import ModelDropZone from '../ModelDropZone';
 import VectorMap from '../VectorMap';
+import Landing from '../Landing';
 import ModelInfo, { ModelInfoSetting, testFeature } from '../ModelInfo';
 import ModelFeatureCollection from '../../interfaces/ModelFeatureCollection';
 import './index.css';
@@ -75,13 +76,14 @@ class App extends Component<Props, AppState> {
         <div className="App">
           <header className="App-header">
 
-            {modelGeoJson &&
+            {modelGeoJson ?
               <>
                 <VectorMap onSelectFeature={this._updateSelectedFeature} modelGeoJson={modelGeoJson} />
                 <ModelInfo settings={setting} onChange={this._updateSettings} />
 
 
-              </>
+              </> :
+              <Landing />
             }
           </header>
 

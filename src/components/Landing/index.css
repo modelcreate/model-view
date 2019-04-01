@@ -1,0 +1,102 @@
+.flex-grid {
+  display: flex;
+  height: 100vh;
+  font-family: 'Roboto', sans-serif;
+  background:  linear-gradient(rgba(0, 0, 0, 0.1),rgba(0, 0, 0, 0.1)), url(/imgs/background.png) no-repeat center right;
+  background-size: cover;
+  color:rgba(0,0,0,.77);
+}
+
+.flex-grid .col1 {
+  padding: 20px;
+  background-color: #fafafa;
+  box-shadow: 1px;
+  box-shadow: 0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12);
+}
+
+.flex-grid h3 {
+  margin: 0;
+    padding-top: 90px;
+    font-size: 1em;
+    margin-left: 3px;
+    margin-bottom: -5px;
+}
+
+.flex-grid h1 {
+  margin: 0;
+    font-size: 2.8em;
+}
+
+.flex-grid .subtitle {
+  margin-top: -4px;
+  margin-left: 4px;
+  font-size: calc(8px + 1.4vmin);
+}
+.flex-grid .droparea {
+  text-align: center;
+  padding: 80px;
+  border: 2px dashed rgb(145, 145, 145);
+  border-radius: 15px;
+  margin: 30px 50px;
+  color: rgb(145, 145, 145)
+}
+
+.droparea p {
+  font-size: 0.6em;
+}
+
+.flex-grid a {
+  font-size: 10px
+}
+
+.col1 {
+  flex: 3;
+}
+.col2 {
+  flex: 4;
+}
+
+.btns-float-left {
+  float:right;
+  margin-right: 45px;
+}
+
+/* Material Button*/
+.btn {
+  margin: 0px 5px ;
+  padding: 0;
+  overflow: hidden;
+  border-width: 0;
+  outline: none;
+  border-radius: 2px;
+  box-shadow: 0px 1px 5px 0px rgba(0,0,0,0.2), 0px 2px 2px 0px rgba(0,0,0,0.14), 0px 3px 1px -2px rgba(0,0,0,0.12);
+  background-color: #e0e0e0;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.btn:hover, .btn:focus {
+  background-color: #d5d5d5;
+}
+
+
+.btn span {
+  display: block;
+  padding: 12px 24px;
+}
+
+
+.btn.blue{
+  background-color: #2196f3;
+  color: #ecf0f1;
+}
+
+.btn.blue:hover, .btn.blue:focus {
+  background-color: #1976d2;
+  color: #ecf0f1;
+}
+
+@media (max-width: 400px) {
+  .flex-grid {
+    display: block;
+  }
+}
