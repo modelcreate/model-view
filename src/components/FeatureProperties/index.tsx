@@ -7,13 +7,13 @@ import './index.css';
 
 type FeatureProperties = {
   feature: ModelInfoSetting,
-  tsv: string[]
+  tsv: string[],
+  selectedFeature: { [name: string]: any }
 }
 
 
-const FeatureProperties: FunctionComponent<FeatureProperties> = ({ feature, tsv }) => {
+const FeatureProperties: FunctionComponent<FeatureProperties> = ({ feature, tsv, selectedFeature }) => {
 
-  const { selectedFeature } = feature
   //const selectId = Object.keys(selectedFeature).find(key => selectedFeature[key].constructor === Array)
   const [timeSeriesId, setTimeSeriesId] = useState(tsv[0])
 
@@ -25,6 +25,7 @@ const FeatureProperties: FunctionComponent<FeatureProperties> = ({ feature, tsv 
 
   return (
     <div>
+      <hr />
       {
 
         <TimeSeriesChart timeseriesData={selectedFeature[timeSeriesId]} currentTimestep={feature.currentTimestep} timesteps={feature.timesteps} />
