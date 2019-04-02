@@ -43,6 +43,12 @@
 
 .droparea p {
   font-size: 0.6em;
+  color: rgb(145, 145, 145);
+}
+
+.blurb {
+  font-size: 0.5em;
+  color: rgb(145, 145, 145);
 }
 
 .flex-grid a {
