@@ -1,5 +1,6 @@
 import React, { FunctionComponent } from 'react';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import SelectProjection from '../SelectProjection';
 import './index.css';
 
 type LandingProperties = {
@@ -17,6 +18,7 @@ const Landing: FunctionComponent<LandingProperties> = ({ isLoading }) => {
         <p className="subtitle">Share and view models in the browser</p>
         <p className="blurb">Model View is under active development and this version is an early preview.</p>
         <p className="blurb">This application and its source code are free and open source under AGPLv3. Feature requests and issues can be logged on GitHub, contact me on LinkedIn or email - luke@matrado.ca</p>
+        <SelectProjection />
         <div className="droparea">
           {isLoading ?
             <CircularProgress />

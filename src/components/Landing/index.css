@@ -1,3 +1,7 @@
+.react-select-container {
+  font-size: 12px;
+}
+
 .flex-grid {
   display: flex;
   height: 100vh;
