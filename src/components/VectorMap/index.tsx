@@ -10,6 +10,7 @@ import { MapboxEvent } from 'mapbox-gl';
 const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 
 type VectorMapProps = {
+  projectionString: string,
   modelGeoJson: FeatureCollection<Geometries, Properties>,
   onSelectFeature: (value: Feature) => void;
 }
@@ -50,7 +51,7 @@ class VectorMap extends Component<VectorMapProps, VectorMapState> {
 
 
     const fromProjection = '+proj=tmerc +lat_0=49 +lon_0=-2 +k=0.9996012717 +x_0=400000 +y_0=-100000 +ellps=airy +towgs84=375,-111,431,0,0,0,0 +units=m +no_defs'
-    const geoJson = reprojectFeatureCollection(this.props.modelGeoJson, fromProjection)
+    const geoJson = reprojectFeatureCollection(this.props.modelGeoJson, this.props.projectionString)
     console.log(geoJson)
     const wn_hydrant = extractAssetType(geoJson, ['wn_hydrant'])
     const wn_pipe = extractAssetType(geoJson, ['wn_pipe', 'wn_meter', 'wn_valve'])

@@ -9,11 +9,19 @@ interface ProjectionOption {
   label: string;
 }
 
+type SelectProjectionProps = {
+  onSelectProj: (proj: string) => void
+}
+interface SelectProjectionState {
+  selectedOption: ValueType<ProjectionOption> | null
+}
 
-class SelectProjection extends React.Component {
-  state = {
+
+class SelectProjection extends React.Component<SelectProjectionProps, SelectProjectionState> {
+  state: Readonly<SelectProjectionState> = {
     selectedOption: null
   };
+
   onInputChange = (inputValue: ValueType<ProjectionOption>, { action }: ActionMeta) => {
 
 
@@ -36,18 +44,34 @@ class SelectProjection extends React.Component {
     );
   }
 
+  _submitProjection = () => {
+    if (this.state.selectedOption) {
+      // Todo, fix this us - source https://github.com/JedWatson/react-select/issues/2902
+      if (Array.isArray(this.state.selectedOption)) {
+        throw new Error("Unexpected type passed to ReactSelect onChange handler");
+      }
+      const test = this.state.selectedOption
+      this.props.onSelectProj(this.state.selectedOption.value)
+    }
+  }
+
   render() {
     const { selectedOption } = this.state;
     return (
-      <AsyncSelect
-        className='react-select-container'
-        classNamePrefix="react-select"
-        value={selectedOption}
-        onChange={this.onInputChange}
-        name="color"
-        //options={proj4List}
-        loadOptions={this.getOptions}
-      />
+      <>
+        <AsyncSelect
+          className='react-select-container'
+          classNamePrefix="react-select"
+          value={selectedOption}
+          onChange={this.onInputChange}
+          name="color"
+          //options={proj4List}
+          loadOptions={this.getOptions}
+        />
+        {this.state.selectedOption &&
+          <button onClick={this._submitProjection}>Go</button>
+        }
+      </>
     );
   }
 }
