@@ -21,14 +21,14 @@ type Props = {}
 
 interface AppState {
   modelGeoJson?: FeatureCollection<Geometries, Properties>
-  isLoaded: boolean,
+  isLoading: boolean,
   setting: ModelInfoSetting
 }
 
 
 class App extends Component<Props, AppState> {
   state: Readonly<AppState> = {
-    isLoaded: false,
+    isLoading: false,
     setting
   };
 
@@ -36,6 +36,7 @@ class App extends Component<Props, AppState> {
   droppedJson = (file: ModelFeatureCollection) => {
 
     this.setState(prevState => ({
+      isLoading: true,
       modelGeoJson: file,
       setting: {
         ...prevState.setting,
@@ -69,7 +70,7 @@ class App extends Component<Props, AppState> {
 
 
   render() {
-    const { isLoaded, modelGeoJson, setting } = this.state
+    const { isLoading, modelGeoJson, setting } = this.state
 
     return (
       <ModelDropZone onDroppedJson={this.droppedJson}>
@@ -83,7 +84,7 @@ class App extends Component<Props, AppState> {
 
 
               </> :
-              <Landing />
+              <Landing isLoading={isLoading} />
             }
           </header>
 

@@ -1,7 +1,13 @@
 import React, { FunctionComponent } from 'react';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import './index.css';
 
-const Landing: FunctionComponent = () => {
+type LandingProperties = {
+  isLoading: boolean
+}
+
+
+const Landing: FunctionComponent<LandingProperties> = ({ isLoading }) => {
 
   return (
     <div className="flex-grid">
@@ -10,7 +16,12 @@ const Landing: FunctionComponent = () => {
         <h1>Model View</h1>
         <p className="subtitle">Share and view models in the browser</p>
         <div className="droparea">
-          <p>Drop model extract here</p>
+          {isLoading ?
+            <CircularProgress />
+            :
+            <p>Drop model extract here</p>
+
+          }
         </div>
         <div className="btns-float-left">
           <a href="https://github.com/modelcreate/model-view/"><button className="btn blue" type="button"><span>Model Extract Guide</span></button></a>

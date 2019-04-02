@@ -4,6 +4,7 @@
   "private": true,
   "homepage": "https://modelview.matrado.ca",
   "dependencies": {
+    "@material-ui/core": "^3.9.3",
     "@turf/turf": "^5.1.6",
     "@types/jest": "24.0.11",
     "@types/node": "11.12.0",
