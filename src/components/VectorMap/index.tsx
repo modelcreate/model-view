@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import ReactMapGL, { PointerEvent, ExtraState } from 'react-map-gl';
 import { fromJS } from 'immutable';
-import { OsZoomStackLight, HydrantStyle, MainStyle, MeterStyle, ValveStyle } from '../../mapstyles'
+import { OsZoomStackLight, MapboxStyle, HydrantStyle, MainStyle, MeterStyle, ValveStyle } from '../../mapstyles'
 import { reprojectFeatureCollection } from '../../utils/reproject'
 import { FeatureCollection, Feature, Geometries, Properties, featureCollection } from '@turf/helpers';
 import { MapboxEvent } from 'mapbox-gl';
@@ -58,7 +58,7 @@ class VectorMap extends Component<VectorMapProps, VectorMapState> {
     const wn_meter = extractAssetType(geoJson, ['wn_meter'])
     const wn_valve = extractAssetType(geoJson, ['wn_valve'])
 
-    const immutBase = fromJS(OsZoomStackLight)
+    const immutBase = fromJS(MapboxStyle)//OsZoomStackLight)
     const mapStyle = immutBase
       .setIn(['sources', 'hydrants'], fromJS({ type: 'geojson', data: wn_hydrant }))
       .setIn(['sources', 'mains'], fromJS({ type: 'geojson', data: wn_pipe }))
