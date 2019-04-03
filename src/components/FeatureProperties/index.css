@@ -18,3 +18,10 @@
 .feature-data-table {
   text-align: left;
 }
+
+.close-button {
+  position: absolute;
+  top: 95px;
+  right: 15px;
+  z-index: 101;
+}

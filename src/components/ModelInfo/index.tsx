@@ -19,11 +19,12 @@ export interface ModelInfoSetting {
 
 type ModelInfoProps = {
   settings: ModelInfoSetting,
-  onChange: (value: string) => void;
+  onChange: (value: string) => void,
+  onClearSelected: () => void
 }
 
 
-const ModelInfo: FunctionComponent<ModelInfoProps> = ({ settings, onChange }) => {
+const ModelInfo: FunctionComponent<ModelInfoProps> = ({ settings, onChange, onClearSelected }) => {
 
   return (
     <DefaultContainer>
@@ -45,7 +46,13 @@ const ModelInfo: FunctionComponent<ModelInfoProps> = ({ settings, onChange }) =>
       </div>
 
       {settings.selectedFeature &&
-        <FeatureProperties selectedFeature={settings.selectedFeature} key={settings.selectedFeature.us_node_id} feature={settings} tsv={Object.keys(settings.selectedFeature).filter(key => settings.selectedFeature && settings.selectedFeature[key].constructor === Array)} />
+        <FeatureProperties
+          onClearSelected={onClearSelected}
+          selectedFeature={settings.selectedFeature}
+          key={settings.selectedFeature.us_node_id}
+          feature={settings}
+          tsv={Object.keys(settings.selectedFeature).filter(key => settings.selectedFeature && settings.selectedFeature[key].constructor === Array)}
+        />
       }
 
 
