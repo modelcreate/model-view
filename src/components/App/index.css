@@ -17,3 +17,9 @@
   z-index: 9;
   pointer-events: none;
 }
+
+.mapboxgl-ctrl-attrib {
+  padding: 0 5px;
+  background-color: rgba(0, 0, 0, 0.15)!important;
+  margin: 0;
+}

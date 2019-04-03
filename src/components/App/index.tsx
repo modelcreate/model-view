@@ -21,14 +21,18 @@ type Props = {}
 
 interface AppState {
   modelGeoJson?: FeatureCollection<Geometries, Properties>
-  isLoaded: boolean,
+  isLoading: boolean,
+  isFileLoaded: boolean,
+  projectionString: string,
   setting: ModelInfoSetting
 }
 
 
 class App extends Component<Props, AppState> {
   state: Readonly<AppState> = {
-    isLoaded: false,
+    isLoading: false,
+    isFileLoaded: false,
+    projectionString: '',
     setting
   };
 
@@ -36,6 +40,7 @@ class App extends Component<Props, AppState> {
   droppedJson = (file: ModelFeatureCollection) => {
 
     this.setState(prevState => ({
+      isFileLoaded: true,
       modelGeoJson: file,
       setting: {
         ...prevState.setting,
@@ -67,23 +72,27 @@ class App extends Component<Props, AppState> {
 
   };
 
+  _updateProjectionString = (projectionString: string) => {
+    this.setState(prevState => ({ projectionString, isLoading: true }))
+  }
+
 
   render() {
-    const { isLoaded, modelGeoJson, setting } = this.state
+    const { isLoading, isFileLoaded, modelGeoJson, setting, projectionString } = this.state
 
     return (
       <ModelDropZone onDroppedJson={this.droppedJson}>
         <div className="App">
           <header className="App-header">
 
-            {modelGeoJson ?
+            {modelGeoJson && projectionString !== '' ?
               <>
-                <VectorMap onSelectFeature={this._updateSelectedFeature} modelGeoJson={modelGeoJson} />
+                <VectorMap projectionString={projectionString} onSelectFeature={this._updateSelectedFeature} modelGeoJson={modelGeoJson} />
                 <ModelInfo settings={setting} onChange={this._updateSettings} />
 
 
               </> :
-              <Landing />
+              <Landing isLoading={isLoading} isFileLoaded={isFileLoaded} onSelectProj={this._updateProjectionString} />
             }
           </header>
 

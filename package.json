@@ -4,6 +4,7 @@
   "private": true,
   "homepage": "https://modelview.matrado.ca",
   "dependencies": {
+    "@material-ui/core": "^3.9.3",
     "@turf/turf": "^5.1.6",
     "@types/jest": "24.0.11",
     "@types/node": "11.12.0",
@@ -11,6 +12,7 @@
     "@types/react": "16.8.10",
     "@types/react-dom": "16.8.3",
     "@types/react-map-gl": "^4.1.1",
+    "@types/react-select": "^2.0.15",
     "@types/victory": "^31.0.14",
     "date-fns": "^1.30.1",
     "deck.gl": "^6.4.8",
@@ -22,6 +24,7 @@
     "react-dropzone": "^10.0.6",
     "react-map-gl": "^4.1.1",
     "react-scripts": "2.1.8",
+    "react-select": "^2.4.2",
     "typescript": "3.3.4000",
     "victory": "^32.1.0"
   },
