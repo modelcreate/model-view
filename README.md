@@ -1,5 +1,7 @@
 ## Model Create
-![Title Image](https://raw.githubusercontent.com/modelcreate/model-view/master/ModelViewPreview.gif)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/modelcreate/model-view/master/ModelViewPreview.gif" alt="Title Image"/>
+</p>
 
 Display models created in InfoWorks WS Pro directly in the browser. No data leaves your computer; all data rendered and processed locally.
 
