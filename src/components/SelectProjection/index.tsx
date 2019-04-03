@@ -1,6 +1,7 @@
 import React from 'react';
 import AsyncSelect from 'react-select/lib/Async';
 import { ValueType, ActionMeta, OptionsType } from 'react-select/lib/types';
+import Button from '@material-ui/core/Button';
 import { proj4List } from './epsg'
 
 
@@ -59,7 +60,10 @@ class SelectProjection extends React.Component<SelectProjectionProps, SelectProj
     const { selectedOption } = this.state;
     return (
       <>
+        <p className="model-proj-subtitle">Model Projection:</p>
         <AsyncSelect
+          autoFocus
+          placeholder="Start typing to searching projections..."
           className='react-select-container'
           classNamePrefix="react-select"
           value={selectedOption}
@@ -69,7 +73,11 @@ class SelectProjection extends React.Component<SelectProjectionProps, SelectProj
           loadOptions={this.getOptions}
         />
         {this.state.selectedOption &&
-          <button onClick={this._submitProjection}>Go</button>
+          <div className="btns-float-left">
+            <Button variant="contained" color="primary" onClick={this._submitProjection} >
+              View Model
+          </Button>
+          </div>
         }
       </>
     );

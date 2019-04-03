@@ -58,7 +58,7 @@ class VectorMap extends Component<VectorMapProps, VectorMapState> {
     const wn_meter = extractAssetType(geoJson, ['wn_meter'])
     const wn_valve = extractAssetType(geoJson, ['wn_valve'])
 
-    const immutBase = fromJS(MapboxStyle)
+    const immutBase = fromJS(MapboxStyle)//MapboxStyle)
     const mapStyle = immutBase
       .setIn(['sources', 'hydrants'], fromJS({ type: 'geojson', data: wn_hydrant }))
       .setIn(['sources', 'mains'], fromJS({ type: 'geojson', data: wn_pipe }))
