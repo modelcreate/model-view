@@ -47,7 +47,7 @@ const Landing: FunctionComponent<LandingProperties> = ({ isLoading, isFileLoaded
                 <p className="blurb">All data is proccessed client side, no model data sent to the server.</p>
               </div>
               <div className="btns-float-left">
-                <Button className={classes.button} variant="contained" color="primary" href="https://github.com/modelcreate/model-view/">
+                <Button className={classes.button} variant="contained" color="primary" href="https://github.com/modelcreate/model-view/tree/master/ruby">
                   Model Extract Guide
           </Button>
                 <Button className={classes.button} variant="contained" href="https://github.com/modelcreate/model-view/">
