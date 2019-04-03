@@ -13,7 +13,7 @@
 
 .flex-grid {
   display: flex;
-  height: 100vh;
+  min-height: 100vh;
   font-family: 'Roboto', sans-serif;
   background:  linear-gradient(rgba(0, 0, 0, 0.1),rgba(0, 0, 0, 0.1)), url(/imgs/background.png) no-repeat center right;
   background-size: cover;
@@ -29,7 +29,7 @@
 
 .flex-grid h3 {
   margin: 0;
-    padding-top: 90px;
+    padding-top: 40px;
     font-size: 1em;
     margin-left: 3px;
     margin-bottom: -5px;
@@ -62,6 +62,7 @@
 .blurb {
   font-size: 0.5em;
   color: rgb(145, 145, 145);
+  margin-left: 5px;
 }
 
 

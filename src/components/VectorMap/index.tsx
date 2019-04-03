@@ -3,8 +3,9 @@ import ReactMapGL, { PointerEvent, ExtraState } from 'react-map-gl';
 import { fromJS } from 'immutable';
 import { OsZoomStackLight, MapboxStyle, HydrantStyle, MainStyle, MeterStyle, ValveStyle } from '../../mapstyles'
 import { reprojectFeatureCollection } from '../../utils/reproject'
-import { FeatureCollection, Feature, Geometries, Properties, featureCollection } from '@turf/helpers';
-import { AttributionControl } from 'mapbox-gl';
+import { FeatureCollection, Feature, Geometries, Properties, featureCollection, BBox } from '@turf/helpers';
+import bbox from '@turf/bbox';
+import { AttributionControl, LngLatBoundsLike } from 'mapbox-gl';
 
 
 const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
@@ -56,6 +57,11 @@ class VectorMap extends Component<VectorMapProps, VectorMapState> {
         }));
       }
 
+      const json = this.state.mapStyle.toJS()
+      const jsonbbox = bbox(json.sources.mains.data)
+      if (jsonbbox && jsonbbox.length == 4) {
+        this._map.fitBounds(jsonbbox, { duration: 10000 })
+      }
     }
   }
 
@@ -65,6 +71,7 @@ class VectorMap extends Component<VectorMapProps, VectorMapState> {
     const britishNationalGrid = '+proj=tmerc +lat_0=49 +lon_0=-2 +k=0.9996012717 +x_0=400000 +y_0=-100000 +datum=OSGB36 +units=m +no_defs'
     const geoJson = reprojectFeatureCollection(this.props.modelGeoJson, this.props.projectionString)
     console.log(geoJson)
+
     const wn_hydrant = extractAssetType(geoJson, ['wn_hydrant'])
     const wn_pipe = extractAssetType(geoJson, ['wn_pipe', 'wn_meter', 'wn_valve'])
     const wn_meter = extractAssetType(geoJson, ['wn_meter'])
@@ -93,9 +100,9 @@ class VectorMap extends Component<VectorMapProps, VectorMapState> {
 
   state: Readonly<VectorMapState> = {
     viewport: {
-      latitude: -19.174995361886754,//56.83955911423721,  
-      longitude: 146.836610606952, //,//-2.287646619512958,
-      zoom: 10
+      latitude: 0,//56.83955911423721,  
+      longitude: 0, //,//-2.287646619512958,
+      zoom: 0
     },
     mapStyle: this._createStyles(),
     interactiveLayerIds: ['hydrants-geojson', 'main-geojson'],

@@ -39,8 +39,8 @@ const Landing: FunctionComponent<LandingProperties> = ({ isLoading, isFileLoaded
             :
             <>
               <p className="subtitle">Share and view models in the browser</p>
-              <p className="blurb">Model View is under active development and this version is an early preview.</p>
-              <p className="blurb">This application and its source code are free and open source under AGPLv3. Feature requests and issues can be logged on GitHub, contact me on LinkedIn or email - luke@matrado.ca</p>
+              <p className="blurb">Model View is under active development, this version is an early preview.</p>
+              <p className="blurb">This application and its source code is free and open source under AGPLv3. Feature requests and issues can be logged on GitHub, contact me on <a href="https://www.linkedin.com/in/lukepbutler/">LinkedIn</a> or email - luke@matrado.ca</p>
 
               <div className="droparea">
                 <p>Drop model extract here</p>
