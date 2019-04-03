@@ -6,6 +6,7 @@
   "dependencies": {
     "@material-ui/core": "^3.9.3",
     "@turf/turf": "^5.1.6",
+    "@types/d3-ease": "^1.0.8",
     "@types/jest": "24.0.11",
     "@types/node": "11.12.0",
     "@types/proj4": "^2.5.0",
@@ -14,6 +15,8 @@
     "@types/react-map-gl": "^4.1.1",
     "@types/react-select": "^2.0.15",
     "@types/victory": "^31.0.14",
+    "@types/viewport-mercator-project": "^6.1.0",
+    "d3-ease": "^1.0.5",
     "date-fns": "^1.30.1",
     "deck.gl": "^6.4.8",
     "gh-pages": "^2.0.1",
@@ -26,7 +29,8 @@
     "react-scripts": "2.1.8",
     "react-select": "^2.4.2",
     "typescript": "3.3.4000",
-    "victory": "^32.1.0"
+    "victory": "^32.1.0",
+    "viewport-mercator-project": "^6.1.1"
   },
   "scripts": {
     "predeploy": "npm run build",

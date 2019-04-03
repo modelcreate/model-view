@@ -1,11 +1,14 @@
 import React, { Component } from 'react';
-import ReactMapGL, { PointerEvent, ExtraState } from 'react-map-gl';
+import ReactMapGL, { PointerEvent, ExtraState, ViewState, FlyToInterpolator } from 'react-map-gl';
 import { fromJS } from 'immutable';
 import { OsZoomStackLight, MapboxStyle, HydrantStyle, MainStyle, MeterStyle, ValveStyle } from '../../mapstyles'
 import { reprojectFeatureCollection } from '../../utils/reproject'
 import { FeatureCollection, Feature, Geometries, Properties, featureCollection, BBox } from '@turf/helpers';
 import bbox from '@turf/bbox';
 import { AttributionControl, LngLatBoundsLike } from 'mapbox-gl';
+import { easeCubic } from 'd3-ease';
+import WebMercatorViewport from 'viewport-mercator-project';
+
 
 
 const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
@@ -59,9 +62,7 @@ class VectorMap extends Component<VectorMapProps, VectorMapState> {
 
       const json = this.state.mapStyle.toJS()
       const jsonbbox = bbox(json.sources.mains.data)
-      if (jsonbbox && jsonbbox.length == 4) {
-        this._map.fitBounds(jsonbbox, { duration: 10000 })
-      }
+      this._goToBBox(jsonbbox)
     }
   }
 
@@ -159,7 +160,28 @@ class VectorMap extends Component<VectorMapProps, VectorMapState> {
 
 
 
+  _onViewportChange = (viewport: ViewState) => {
+    this.setState({ viewport });
+  };
 
+  _goToBBox = (jsonbbox: BBox) => {
+    const { longitude, latitude, zoom } = new WebMercatorViewport(this.state.viewport)
+      .fitBounds([[jsonbbox[0], jsonbbox[1]], [jsonbbox[2], jsonbbox[3]]], {
+        padding: 20,
+      });
+
+
+    const viewport = {
+      ...this.state.viewport,
+      longitude,
+      latitude,
+      zoom,
+      transitionDuration: 7000,
+      transitionInterpolator: new FlyToInterpolator(),
+      transitionEasing: easeCubic
+    };
+    this.setState({ viewport });
+  };
 
 
   render() {
@@ -175,7 +197,7 @@ class VectorMap extends Component<VectorMapProps, VectorMapState> {
             this._map = ref.getMap()
           }
         }}
-        onViewportChange={(viewport) => this.setState({ viewport })}
+        onViewportChange={this._onViewportChange}
         onLoad={() => { this._addImage() }}
         //onHover={this._onHover}
         attributionControl={true}
