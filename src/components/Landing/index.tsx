@@ -18,12 +18,13 @@ const styles = (theme: Theme) => createStyles({
 interface LandingProperties extends WithStyles<typeof styles> {
   isLoading: boolean,
   isFileLoaded: boolean,
-  onSelectProj: (proj: string) => void
+  onSelectProj: (proj: string) => void,
+  onLoadDemo: () => void
 }
 
 
 
-const Landing: FunctionComponent<LandingProperties> = ({ isLoading, isFileLoaded, onSelectProj, classes }) => {
+const Landing: FunctionComponent<LandingProperties> = ({ isLoading, isFileLoaded, onSelectProj, onLoadDemo, classes }) => {
 
   return (
     <div className="flex-grid">
@@ -45,11 +46,15 @@ const Landing: FunctionComponent<LandingProperties> = ({ isLoading, isFileLoaded
               <div className="droparea">
                 <p>Drop model extract here</p>
                 <p className="blurb">All data is proccessed client side, no model data sent to the server.</p>
+                <Button className={classes.button} color="secondary" onClick={onLoadDemo}>
+                  Load Demo Model
+          </Button>
               </div>
               <div className="btns-float-left">
                 <Button className={classes.button} variant="contained" color="primary" href="https://github.com/modelcreate/model-view/tree/master/ruby">
                   Model Extract Guide
           </Button>
+
                 <Button className={classes.button} variant="contained" href="https://github.com/modelcreate/model-view/">
                   Github
           </Button>

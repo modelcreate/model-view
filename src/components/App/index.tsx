@@ -36,6 +36,15 @@ class App extends Component<Props, AppState> {
     setting
   };
 
+  loadDemo = () => {
+    const projectionString = "+proj=utm +zone=55 +south +ellps=aust_SA +towgs84=-117.808,-51.536,137.784,0.303,0.446,0.234,-0.29 +units=m +no_defs"
+    this.setState(prevState => ({ projectionString, isLoading: true }))
+    const demo = fetch('https://raw.githubusercontent.com/modelcreate/model-view/master/data/MagneticIsland.json')
+      .then(res => res.json())
+      .then(body => {
+        this.droppedJson(body);
+      })
+  }
 
   droppedJson = (file: ModelFeatureCollection) => {
 
@@ -92,7 +101,7 @@ class App extends Component<Props, AppState> {
 
 
               </> :
-              <Landing isLoading={isLoading} isFileLoaded={isFileLoaded} onSelectProj={this._updateProjectionString} />
+              <Landing onLoadDemo={this.loadDemo} isLoading={isLoading} isFileLoaded={isFileLoaded} onSelectProj={this._updateProjectionString} />
             }
           </header>
 
