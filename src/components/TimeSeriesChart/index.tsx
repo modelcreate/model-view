@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useState } from 'react';
-import { VictoryChart, VictoryLine } from 'victory';
+import { VictoryChart, VictoryLine, VictoryLabel } from 'victory';
 import { ModelInfoSetting } from '../ModelInfo';
 import { debug } from 'util';
 
@@ -32,8 +32,10 @@ const TimeSeriesChart: FunctionComponent<TimeSeriesChartProps> = ({ timeseriesDa
         }} x={() => timesteps[currentTimestep].getTime()} />
         <VictoryLine
           data={data}
+          labels={(d: { "x": Date; "y": number; }) => timesteps[currentTimestep] === d.x ? d.y : null}
           style={{
-            data: { stroke: "#1528f7" }
+            data: { stroke: "#1528f7" },
+            labels: { fill: "#00000", fontSize: 20, textAnchor: "start" }
           }}
 
         />
