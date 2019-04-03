@@ -81,6 +81,15 @@ class App extends Component<Props, AppState> {
 
   };
 
+  _clearSelectedFeature = () => {
+    this.setState(prevState => ({
+      setting: {
+        ...prevState.setting,
+        selectedFeature: null
+      }
+    }))
+  }
+
   _updateProjectionString = (projectionString: string) => {
     this.setState(prevState => ({ projectionString, isLoading: true }))
   }
@@ -97,7 +106,7 @@ class App extends Component<Props, AppState> {
             {modelGeoJson && projectionString !== '' ?
               <>
                 <VectorMap projectionString={projectionString} onSelectFeature={this._updateSelectedFeature} modelGeoJson={modelGeoJson} />
-                <ModelInfo settings={setting} onChange={this._updateSettings} />
+                <ModelInfo settings={setting} onChange={this._updateSettings} onClearSelected={this._clearSelectedFeature} />
 
 
               </> :

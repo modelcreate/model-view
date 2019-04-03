@@ -15,28 +15,20 @@
   position: absolute;
   top: 0;
   right: 0;
-  max-width: 300px;
   background: #fff;
   box-shadow: 0 2px 4px rgba(0,0,0,0.3);
   padding: 12px 12px;
-  margin: 20px;
-  font-size: 13px;
+  font-size: 0.5em;
   color: #6b6b76;
   outline: none;
-  max-height: calc(100% - 64px);
 }
 
 
 .control-panel-data {
   overflow-x: auto;
-    max-height: calc(100vh - 280px);
 }
 
-.control-panel h3 {
-  font-size: 1.2em;
-  font-weight: 500;
-  margin: 8px 0;
-}
+
 
 .control-panel p {
   margin-bottom: 16px;
@@ -47,3 +39,129 @@ hr {
   background: #ededed;
   height: 1px;
 }
+
+@media (min-width:320px)  { 
+
+  .control-panel {
+    margin: 0;
+    min-width: calc(100% - 24px);
+    z-index:100;
+  }
+  .time-controls {
+    text-align: center;
+  }
+
+  .control-panel h1, .control-panel h2 {
+    display: inline;
+    font-size: 1.5em;
+  }
+
+  .control-panel h1 {
+    margin-left: 10px;
+  }
+
+  .control-panel-data {
+    height: calc(100vh - 270px)
+  }
+  .input {
+    margin-top: 10px;
+  }
+}
+
+@media only screen and (min-width:568px)  { 
+  
+  .control-panel {
+    margin: 0;
+    max-width: 200px;
+    min-width: 100px;
+    z-index:0;
+  }
+  .control-panel-data {
+    height: calc(100vh - 210px)
+  }
+
+  .control-panel h1, .control-panel h2 {
+    display: block;
+  }
+  .control-panel h2 {
+    font-size: 1em;
+  }
+  .control-panel h1 {
+    font-size: 1.5em;
+    margin-left: 0px;
+  }
+  .input {
+    margin-top: 0px;
+  }
+} 
+
+
+@media only screen and (min-width:961px)  { 
+  
+  .control-panel {
+    max-width: 300px;
+    margin: 20px;
+    
+  }
+  .control-panel-data {
+      max-height: calc(100vh - 280px);
+      height: 100%
+  }
+  .control-panel h2 {
+    font-size: 1.5em;
+  }
+  .control-panel h1 {
+    font-size: 2em;
+  }
+} 
+
+/* 
+CSS Media Debug
+@media only screen and (min-width:320px)  { 
+
+  body::before {
+    content: "smartphones";
+    font-weight: bold;
+    display: block;
+    text-align: center;
+    background: rgba(255, 255, 0, 0.9);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 99;
+  }
+} 
+@media only screen and (min-width:568px)  { 
+
+  body::before {
+    content: "portrait tablets, portrait iPad,";
+    font-weight: bold;
+    display: block;
+    text-align: center;
+    background: rgba(255, 255, 0, 0.9);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 99;
+  }
+} 
+@media only screen and (min-width:961px)  { 
+
+  body::before {
+    content: "Full Screen";
+    font-weight: bold;
+    display: block;
+    text-align: center;
+    background: rgba(255, 255, 0, 0.9); 
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 99;
+  }
+} 
+
+
+*/

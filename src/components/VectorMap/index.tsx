@@ -110,23 +110,6 @@ class VectorMap extends Component<VectorMapProps, VectorMapState> {
     usingOsBaseMap: false
   };
 
-  _onHover = (event: PointerEvent) => {
-    const { features, srcEvent: { offsetX, offsetY } } = event;
-    const hoveredFeature = features && features.find(f => f.layer.id === 'hydrants-geojson');
-    this.setState({ hoveredFeature, x: offsetX, y: offsetY });
-  };
-
-  _renderTooltip() {
-    const { hoveredFeature, x, y } = this.state;
-
-    return hoveredFeature && (
-      <div className="tooltip" style={{ left: x, top: y }}>
-        <div>State: {hoveredFeature.properties.name}</div>
-        <div>Median Household Income: {hoveredFeature.properties.value}</div>
-        <div>Percentile: {hoveredFeature.properties.percentile / 8 * 100}</div>
-      </div>
-    );
-  }
 
   _getCursor = (event: ExtraState) => {
     return event.isHovering ? 'pointer' : 'default';
@@ -199,7 +182,6 @@ class VectorMap extends Component<VectorMapProps, VectorMapState> {
         }}
         onViewportChange={this._onViewportChange}
         onLoad={() => { this._addImage() }}
-        //onHover={this._onHover}
         attributionControl={true}
         onClick={this._onClick}
         getCursor={this._getCursor}
@@ -209,7 +191,6 @@ class VectorMap extends Component<VectorMapProps, VectorMapState> {
         interactiveLayerIds={this.state.interactiveLayerIds}
         clickRadius={2}
       >
-        {this._renderTooltip()}
       </ReactMapGL>
     );
   }
