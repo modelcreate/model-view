@@ -20,10 +20,12 @@ const TimeSeriesChart: FunctionComponent<TimeSeriesChartProps> = ({ timeseriesDa
   const max = Math.max(...timeseriesData)
   const min = Math.min(...timeseriesData)
   const domainMax = Math.max(Math.abs(max), Math.abs(min))
+  const domainMin = Math.min(Math.abs(max), Math.abs(min))
+  const diff = domainMax - domainMin
 
   return (
     <div>
-      <VictoryChart domain={{ y: [0, domainMax] }} width={500} height={180} scale={{ x: "time" }}
+      <VictoryChart domain={{ y: [domainMin - diff * 0.1, domainMax + diff * 0.1] }} width={500} height={180} scale={{ x: "time" }}
       >
         <VictoryLine style={{
           data: { stroke: "tomato" }
