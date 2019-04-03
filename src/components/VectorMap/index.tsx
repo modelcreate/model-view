@@ -4,7 +4,7 @@ import { fromJS } from 'immutable';
 import { OsZoomStackLight, MapboxStyle, HydrantStyle, MainStyle, MeterStyle, ValveStyle } from '../../mapstyles'
 import { reprojectFeatureCollection } from '../../utils/reproject'
 import { FeatureCollection, Feature, Geometries, Properties, featureCollection } from '@turf/helpers';
-import { MapboxEvent } from 'mapbox-gl';
+import { AttributionControl } from 'mapbox-gl';
 
 
 const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
@@ -21,7 +21,8 @@ interface VectorMapState {
   x?: number,
   y?: number,
   hoveredFeature?: any,
-  interactiveLayerIds: string[]
+  interactiveLayerIds: string[],
+  usingOsBaseMap: boolean
 }
 
 
@@ -42,15 +43,26 @@ class VectorMap extends Component<VectorMapProps, VectorMapState> {
     if (this._map !== null) {
       this._map.addImage('meter', MeterStyle.toJS().images[0][1])
       this._map.addImage('valve', ValveStyle.toJS().images[0][1])
-      console.log(MeterStyle.toJS().images[0][1])
+
+      // TODO: This is not DRY or where I should be doing this but I
+      // need the attribution and I have the map here so ill add now
+      // and split later
+      const britishNationalGrid = '+proj=tmerc +lat_0=49 +lon_0=-2 +k=0.9996012717 +x_0=400000 +y_0=-100000 +datum=OSGB36 +units=m +no_defs'
+      const usingOsBaseMap = this.props.projectionString === britishNationalGrid
+      if (usingOsBaseMap) {
+
+        this._map.addControl(new AttributionControl({
+          customAttribution: "Contains OS data © Crown copyright and database right 2019"
+        }));
+      }
+
     }
   }
 
   _createStyles = () => {
 
 
-
-    const fromProjection = '+proj=tmerc +lat_0=49 +lon_0=-2 +k=0.9996012717 +x_0=400000 +y_0=-100000 +ellps=airy +towgs84=375,-111,431,0,0,0,0 +units=m +no_defs'
+    const britishNationalGrid = '+proj=tmerc +lat_0=49 +lon_0=-2 +k=0.9996012717 +x_0=400000 +y_0=-100000 +datum=OSGB36 +units=m +no_defs'
     const geoJson = reprojectFeatureCollection(this.props.modelGeoJson, this.props.projectionString)
     console.log(geoJson)
     const wn_hydrant = extractAssetType(geoJson, ['wn_hydrant'])
@@ -58,7 +70,9 @@ class VectorMap extends Component<VectorMapProps, VectorMapState> {
     const wn_meter = extractAssetType(geoJson, ['wn_meter'])
     const wn_valve = extractAssetType(geoJson, ['wn_valve'])
 
-    const immutBase = fromJS(MapboxStyle)//MapboxStyle)
+    const usingOsBaseMap = this.props.projectionString === britishNationalGrid
+    const baseStyle = usingOsBaseMap ? OsZoomStackLight : MapboxStyle
+    const immutBase = fromJS(baseStyle)//)
     const mapStyle = immutBase
       .setIn(['sources', 'hydrants'], fromJS({ type: 'geojson', data: wn_hydrant }))
       .setIn(['sources', 'mains'], fromJS({ type: 'geojson', data: wn_pipe }))
@@ -84,7 +98,8 @@ class VectorMap extends Component<VectorMapProps, VectorMapState> {
       zoom: 10
     },
     mapStyle: this._createStyles(),
-    interactiveLayerIds: ['hydrants-geojson', 'main-geojson']
+    interactiveLayerIds: ['hydrants-geojson', 'main-geojson'],
+    usingOsBaseMap: false
   };
 
   _onHover = (event: PointerEvent) => {
@@ -156,6 +171,7 @@ class VectorMap extends Component<VectorMapProps, VectorMapState> {
         onViewportChange={(viewport) => this.setState({ viewport })}
         onLoad={() => { this._addImage() }}
         //onHover={this._onHover}
+        attributionControl={true}
         onClick={this._onClick}
         getCursor={this._getCursor}
         width="100%"
