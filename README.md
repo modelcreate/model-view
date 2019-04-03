@@ -1,15 +1,15 @@
-## Model Create
 <p align="center">
   <img src="https://raw.githubusercontent.com/modelcreate/model-view/master/ModelViewPreview.gif" alt="Title Image"/>
 </p>
 
+## Model Create
 Display models created in InfoWorks WS Pro directly in the browser. No data leaves your computer; all data rendered and processed locally.
 
 Extract a model with the provided Ruby scripts and then drag into the app
 
 ## Extracting Models
 
-Scripts and a guide to convert your model into GeoJSON are included in the Ruby folder, [Click here to find out more](https://github.com/modelcreate/model-view/tree/master/ruby/)
+Scripts and a guide to convert your model into GeoJSON are included in the Ruby folder, [click here to find out more](https://github.com/modelcreate/model-view/tree/master/ruby/)
 
 ## Future Enhancements
 Model View is under active development; this version is an early preview.
@@ -23,7 +23,7 @@ Please feel free to submit feature requests or bugs to GitHub.
 
 ## Running App Locally
 
-In the project directory, you can run:
+This project was created with create-react-app and uses Typescript. To run a local copy fork the repo and in the project directory, you can run:
 
 ### `npm start`
 
