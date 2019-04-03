@@ -27,7 +27,7 @@ const ModelInfo: FunctionComponent<ModelInfoProps> = ({ settings, onChange }) =>
 
   return (
     <DefaultContainer>
-      <div>
+      <div className="time-controls">
         <h2>{format(
           settings.timesteps[settings.currentTimestep],
           'Do MMMM YY'
