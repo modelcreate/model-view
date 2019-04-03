@@ -20,7 +20,7 @@ export function reprojectFeatureCollection(geoJson: FeatureCollection<Geometries
 }
 
 
-export function reprojectFeature(feature: Feature, fromProject: string): Feature {
+export function reprojectFeature(feature: Feature<Geometries, Properties>, fromProject: string): Feature<Geometries, Properties> {
 
   const newFeature = clone(feature)
 
@@ -29,6 +29,22 @@ export function reprojectFeature(feature: Feature, fromProject: string): Feature
     currentCoord[0] = newCoord[0]
     currentCoord[1] = newCoord[1]
   });
+
+  // TODO: Check again later, there is a bug in Mapbox GL JS where if the last two coords
+  // are duplicates then it won't draw the line at high zooms. We will check here and remove
+  // them if they exist
+  // https://github.com/mapbox/mapbox-gl-js/issues/5171
+
+  if (newFeature.geometry && newFeature.geometry.type === "LineString" && newFeature.geometry.coordinates.length > 2) {
+    const totalCoords = newFeature.geometry.coordinates.length
+    const x1 = newFeature.geometry.coordinates[totalCoords - 1][0]
+    const x2 = newFeature.geometry.coordinates[totalCoords - 2][0]
+    const y1 = newFeature.geometry.coordinates[totalCoords - 1][1]
+    const y2 = newFeature.geometry.coordinates[totalCoords - 2][1]
+    if (x1 == x2 && y1 == y2) {
+      newFeature.geometry.coordinates.pop()
+    }
+  }
 
   return newFeature
 }

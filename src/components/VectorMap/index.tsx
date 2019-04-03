@@ -58,7 +58,7 @@ class VectorMap extends Component<VectorMapProps, VectorMapState> {
     const wn_meter = extractAssetType(geoJson, ['wn_meter'])
     const wn_valve = extractAssetType(geoJson, ['wn_valve'])
 
-    const immutBase = fromJS(MapboxStyle)//OsZoomStackLight)
+    const immutBase = fromJS(MapboxStyle)
     const mapStyle = immutBase
       .setIn(['sources', 'hydrants'], fromJS({ type: 'geojson', data: wn_hydrant }))
       .setIn(['sources', 'mains'], fromJS({ type: 'geojson', data: wn_pipe }))
@@ -79,8 +79,8 @@ class VectorMap extends Component<VectorMapProps, VectorMapState> {
 
   state: Readonly<VectorMapState> = {
     viewport: {
-      latitude: 56.83955911423721,
-      longitude: -2.287646619512958,
+      latitude: -19.174995361886754,//56.83955911423721,  
+      longitude: 146.836610606952, //,//-2.287646619512958,
       zoom: 10
     },
     mapStyle: this._createStyles(),
@@ -160,6 +160,7 @@ class VectorMap extends Component<VectorMapProps, VectorMapState> {
         getCursor={this._getCursor}
         width="100%"
         height="100vh"
+        maxZoom={24}
         interactiveLayerIds={this.state.interactiveLayerIds}
         clickRadius={2}
       >
