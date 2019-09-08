@@ -50,7 +50,8 @@ const ModelDropZone: FunctionComponent<ModelDropZone> = ({
         const reader = new FileReader();
         reader.onload = () => {
           if (typeof reader.result === "string") {
-            runEpanet(reader.result);
+            const geoJson = runEpanet(reader.result);
+            onDroppedJson(geoJson);
 
             //  const geoJson: ModelFeatureCollection = JSON.parse(reader.result);
             //  try {
