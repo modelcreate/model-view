@@ -1,5 +1,6 @@
 import { useDropzone } from "react-dropzone";
 import React, { useMemo, useCallback, FunctionComponent } from "react";
+import { runEpanet } from "../../utils/epanet";
 import ModelFeatureCollection from "../../interfaces/ModelFeatureCollection";
 import { geojsonType } from "@turf/invariant";
 
@@ -49,14 +50,16 @@ const ModelDropZone: FunctionComponent<ModelDropZone> = ({
         const reader = new FileReader();
         reader.onload = () => {
           if (typeof reader.result === "string") {
-            const geoJson: ModelFeatureCollection = JSON.parse(reader.result);
-            try {
-              geojsonType(geoJson, "FeatureCollection", "Drop Zone");
-              onDroppedJson(geoJson);
-            } catch (e) {
-              console.log(e);
-              // TODO: Handle if dropped bad JSON data
-            }
+            runEpanet(reader.result);
+
+            //  const geoJson: ModelFeatureCollection = JSON.parse(reader.result);
+            //  try {
+            //    geojsonType(geoJson, "FeatureCollection", "Drop Zone");
+            //    onDroppedJson(geoJson);
+            //  } catch (e) {
+            //    console.log(e);
+            //    // TODO: Handle if dropped bad JSON data
+            //  }
           }
         };
 
@@ -71,7 +74,11 @@ const ModelDropZone: FunctionComponent<ModelDropZone> = ({
     isDragActive,
     isDragAccept,
     isDragReject
-  } = useDropzone({ accept: "application/json", multiple: false, onDrop });
+  } = useDropzone({
+    accept: ["application/json", ""],
+    multiple: false,
+    onDrop
+  });
 
   const style = useMemo(
     () => ({
