@@ -1,17 +1,12 @@
-import {
-  FeatureCollection,
-  featureCollection,
-  feature,
-  Feature,
-  Geometries,
-  Properties
-} from "@turf/helpers";
+import { featureCollection, feature, Feature } from "@turf/helpers";
 import { EpanetResults, NodeResults, LinkResults } from "../EpanetBinary";
 
 import ModelFeatureCollection from "../../interfaces/ModelFeatureCollection";
 
 interface Node {
   objType: string;
+  table: string;
+  node_id: string;
   x: number;
   y: number;
   z: number;
@@ -33,8 +28,9 @@ interface Valve extends Link {
 interface Link {
   objType: string;
   table: string;
-  usNodeId: string;
-  dsNodeId: string;
+  us_node_id: string;
+  ds_node_id: string;
+  link_suffix: string;
   diameter: number;
   minorLoss: number;
   index: number;
@@ -266,12 +262,12 @@ function lineFeature(
   result: LinkResults
 ): Feature {
   const us = [
-    epanetData.nodes[link.usNodeId].x,
-    epanetData.nodes[link.usNodeId].y
+    epanetData.nodes[link.us_node_id].x,
+    epanetData.nodes[link.us_node_id].y
   ];
   const ds = [
-    epanetData.nodes[link.dsNodeId].x,
-    epanetData.nodes[link.dsNodeId].y
+    epanetData.nodes[link.ds_node_id].x,
+    epanetData.nodes[link.ds_node_id].y
   ];
 
   const bends = link.bends
@@ -288,6 +284,8 @@ function lineFeature(
     ...result
   };
 
+  delete props.bends;
+
   return feature(geometry, props);
 }
 
@@ -296,6 +294,8 @@ function junctions(epanetData: EpanetData, currLine: string): EpanetData {
 
   epanetData.nodes[data[0]] = {
     objType: "junction",
+    table: "wn_hydrant",
+    node_id: data[0],
     x: 0,
     y: 0,
     z: parseFloat(data[1]),
@@ -312,6 +312,8 @@ function reservoirs(epanetData: EpanetData, currLine: string): EpanetData {
 
   epanetData.nodes[data[0]] = {
     objType: "reservoir",
+    table: "wn_hydrant",
+    node_id: data[0],
     x: 0,
     y: 0,
     z: parseFloat(data[1]),
@@ -330,8 +332,9 @@ function pipes(epanetData: EpanetData, currLine: string): EpanetData {
   epanetData.links[data[0]] = {
     objType: "pipe",
     table: "wn_pipe",
-    usNodeId: data[1],
-    dsNodeId: data[2],
+    us_node_id: data[1],
+    ds_node_id: data[2],
+    link_suffix: "1",
     length: parseFloat(data[3]),
     diameter: parseFloat(data[4]),
     roughness: parseFloat(data[5]),
@@ -351,8 +354,9 @@ function valves(epanetData: EpanetData, currLine: string): EpanetData {
   epanetData.links[data[0]] = {
     objType: "valve",
     table: "wn_valve",
-    usNodeId: data[1],
-    dsNodeId: data[2],
+    us_node_id: data[1],
+    ds_node_id: data[2],
+    link_suffix: "1",
     diameter: parseFloat(data[3]),
     type: data[4],
     setting: parseFloat(data[6]),
