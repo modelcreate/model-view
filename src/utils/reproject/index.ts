@@ -4,7 +4,7 @@ import {
   Properties,
   Feature
 } from "@turf/helpers";
-import { featureReduce, coordEach } from "@turf/meta";
+import { featureReduce, coordEach, coordReduce } from "@turf/meta";
 import clone from "@turf/clone";
 import { featureCollection } from "@turf/helpers";
 import proj4 from "proj4";
@@ -13,6 +13,8 @@ export function reprojectFeatureCollection(
   geoJson: FeatureCollection<Geometries, Properties>,
   fromProject: string
 ): FeatureCollection {
+  const proj = fromProject === "METERS" ? generateProj(geoJson) : fromProject;
+
   const initialValue: Array<Feature> = [];
 
   const features = featureReduce(
@@ -21,7 +23,7 @@ export function reprojectFeatureCollection(
       const featureReproject = Object.assign(
         {},
         currentFeature,
-        reprojectFeature(currentFeature, fromProject)
+        reprojectFeature(currentFeature, proj)
       );
       return previousValue.concat(featureReproject);
     },
@@ -69,4 +71,23 @@ export function reprojectFeature(
 export function reprojectCoord(coord: number[], fromProject: string): number[] {
   //@ts-ignore
   return proj4(fromProject, proj4("EPSG:4326"), coord);
+}
+
+function generateProj(
+  geoJson: FeatureCollection<Geometries, Properties>
+): string {
+  const minXY = coordReduce(
+    geoJson,
+    function(previousValue, currentCoord) {
+      const minX =
+        currentCoord[0] < previousValue[0] ? currentCoord[0] : previousValue[0];
+      const minY =
+        currentCoord[1] < previousValue[1] ? currentCoord[1] : previousValue[1];
+
+      return [minX, minY];
+    },
+    [Infinity, Infinity]
+  );
+
+  return `+proj=tmerc +k=0.9996012717 +x_0=${minXY[0]} +y_0=${minXY[1]} +units=m +no_defs`;
 }

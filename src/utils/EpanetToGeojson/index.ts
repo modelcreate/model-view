@@ -208,10 +208,10 @@ function readLine(
   epanetData: EpanetData,
   unTrimmedCurrentLine: string
 ): EpanetData {
-  const currLine = unTrimmedCurrentLine.trim();
+  const currLine = unTrimmedCurrentLine.replace(/\s+/g, " ").trim();
 
   // if line starts with ; or is blank skip
-  if (currLine[0] === ";" || currLine[0] === "") {
+  if (currLine[0] === ";" || currLine[0] === "" || currLine[0] === undefined) {
     return epanetData;
   }
 

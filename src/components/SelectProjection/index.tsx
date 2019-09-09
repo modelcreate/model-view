@@ -54,10 +54,23 @@ class SelectProjection extends React.Component<
     }
   };
 
+  _submitFalseProjection = () => {
+    const testProj = "METERS";
+
+    this.props.onSelectProj(testProj);
+  };
+
   render() {
     const { selectedOption } = this.state;
     return (
       <>
+        <p className="model-proj-subtitle">
+          Type out your map projection below if known, e.g. British National
+          Grid - EPSG:27700, this will include background maps in your model.
+        </p>
+        <p className="model-proj-subtitle">
+          Otherwise select 'No Basemap' to load without the background maps.
+        </p>
         <p className="model-proj-subtitle">Model Projection:</p>
         <AsyncSelect
           autoFocus
@@ -81,6 +94,14 @@ class SelectProjection extends React.Component<
             </Button>
           </div>
         )}
+
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={this._submitFalseProjection}
+        >
+          No Basemap
+        </Button>
       </>
     );
   }
