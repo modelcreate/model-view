@@ -16,7 +16,7 @@ enum LinkResultTypes {
   Friction
 }
 
-interface LinkResults {
+export interface LinkResults {
   flow: number[];
   velcoity: number[];
   headloss: number[];
@@ -27,7 +27,7 @@ interface LinkResults {
   friction: number[];
 }
 
-interface NodeResults {
+export interface NodeResults {
   demand: number[];
   head: number[];
   pressure: number[];
@@ -167,6 +167,7 @@ const getResultByteOffSet = (
   resultType: NodeResultTypes | LinkResultTypes
 ): number[] => {
   const linkResultOffset = isNode ? 0 : 16 * prolog.nodeCount;
+  const typeCount = isNode ? prolog.nodeCount : prolog.linkCount;
   const resultSize = 16 * prolog.nodeCount + 32 * prolog.linkCount;
   const answer = [...Array(prolog.reportingPeriods)].map(
     (_, i) =>
@@ -174,7 +175,7 @@ const getResultByteOffSet = (
       resultSize * i +
       linkResultOffset +
       4 * objIndex +
-      4 * resultType * prolog.nodeCount
+      4 * resultType * typeCount
   );
   return answer;
 };
