@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "model-build"
+  },
+  "targets": {
+    "model-build": {
+      "hosting": {
+        "modelview": [
+          "modelview"
+        ]
+      }
+    }
+  }
+}
