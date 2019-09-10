@@ -189,7 +189,7 @@ class VectorMap extends Component<VectorMapProps, VectorMapState> {
     });
 
     const transitionDuration =
-      this.props.projectionString === "METERS" ? 0 : 50000;
+      this.props.projectionString === "METERS" ? 0 : 7000;
 
     const viewport = {
       ...this.state.viewport,

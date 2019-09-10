@@ -26,6 +26,10 @@ const TimeSeriesChart: FunctionComponent<TimeSeriesChartProps> = ({
   const domainMin = Math.min(Math.abs(max), Math.abs(min));
   const diff = domainMax - domainMin;
 
+  const precise = (x: number): string => {
+    return x < 0 ? x.toPrecision(2) : x.toFixed(2).toString();
+  };
+
   return (
     <div>
       <VictoryChart
@@ -43,7 +47,7 @@ const TimeSeriesChart: FunctionComponent<TimeSeriesChartProps> = ({
         <VictoryLine
           data={data}
           labels={(d: { x: Date; y: number }) =>
-            timesteps[currentTimestep] === d.x ? d.y : null
+            timesteps[currentTimestep] === d.x ? precise(d.y) : null
           }
           style={{
             data: { stroke: "#1528f7" },
