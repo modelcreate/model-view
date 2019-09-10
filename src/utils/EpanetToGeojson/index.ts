@@ -14,6 +14,32 @@ interface Node {
   profile?: string;
 }
 
+interface Tank {
+  objType: string;
+  table: string;
+  node_id: string;
+  x: number;
+  y: number;
+  z: number;
+  InitLvl: number;
+  MinLvl: number;
+  MaxLvl: number;
+  Diam: number;
+  MinVol: number;
+  VolCurve: string;
+  index: number;
+}
+
+interface Pump {
+  objType: string;
+  table: string;
+  us_node_id: string;
+  ds_node_id: string;
+  link_suffix: string;
+  index: number;
+  bends?: number[][];
+}
+
 interface Pipe extends Link {
   length: number;
   roughness: number;
@@ -31,18 +57,18 @@ interface Link {
   us_node_id: string;
   ds_node_id: string;
   link_suffix: string;
-  diameter: number;
-  minorLoss: number;
+  diameter?: number;
+  minorLoss?: number;
   index: number;
   bends?: number[][];
 }
 
 interface Nodes {
-  [id: string]: Node;
+  [id: string]: Node | Tank;
 }
 
 interface Links {
-  [id: string]: Pipe | Valve;
+  [id: string]: Pipe | Valve | Pump;
 }
 
 interface EpanetData {
@@ -96,108 +122,11 @@ export function toGeoJson(
   );
 
   const fc = featureCollection(nodeFeatures.concat(linkFeatures));
-
+  console.log(fc);
   const model: ModelFeatureCollection = {
     ...fc,
     model: {
-      timesteps: [
-        "2019-04-01T00:00:00+00:00",
-        "2019-04-01T00:15:00+00:00",
-        "2019-04-01T00:30:00+00:00",
-        "2019-04-01T00:45:00+00:00",
-        "2019-04-01T01:00:00+00:00",
-        "2019-04-01T01:15:00+00:00",
-        "2019-04-01T01:30:00+00:00",
-        "2019-04-01T01:45:00+00:00",
-        "2019-04-01T02:00:00+00:00",
-        "2019-04-01T02:15:00+00:00",
-        "2019-04-01T02:30:00+00:00",
-        "2019-04-01T02:45:00+00:00",
-        "2019-04-01T03:00:00+00:00",
-        "2019-04-01T03:15:00+00:00",
-        "2019-04-01T03:30:00+00:00",
-        "2019-04-01T03:45:00+00:00",
-        "2019-04-01T04:00:00+00:00",
-        "2019-04-01T04:15:00+00:00",
-        "2019-04-01T04:30:00+00:00",
-        "2019-04-01T04:45:00+00:00",
-        "2019-04-01T05:00:00+00:00",
-        "2019-04-01T05:15:00+00:00",
-        "2019-04-01T05:30:00+00:00",
-        "2019-04-01T05:45:00+00:00",
-        "2019-04-01T06:00:00+00:00",
-        "2019-04-01T06:15:00+00:00",
-        "2019-04-01T06:30:00+00:00",
-        "2019-04-01T06:45:00+00:00",
-        "2019-04-01T07:00:00+00:00",
-        "2019-04-01T07:15:00+00:00",
-        "2019-04-01T07:30:00+00:00",
-        "2019-04-01T07:45:00+00:00",
-        "2019-04-01T08:00:00+00:00",
-        "2019-04-01T08:15:00+00:00",
-        "2019-04-01T08:30:00+00:00",
-        "2019-04-01T08:45:00+00:00",
-        "2019-04-01T09:00:00+00:00",
-        "2019-04-01T09:15:00+00:00",
-        "2019-04-01T09:30:00+00:00",
-        "2019-04-01T09:45:00+00:00",
-        "2019-04-01T10:00:00+00:00",
-        "2019-04-01T10:15:00+00:00",
-        "2019-04-01T10:30:00+00:00",
-        "2019-04-01T10:45:00+00:00",
-        "2019-04-01T11:00:00+00:00",
-        "2019-04-01T11:15:00+00:00",
-        "2019-04-01T11:30:00+00:00",
-        "2019-04-01T11:45:00+00:00",
-        "2019-04-01T12:00:00+00:00",
-        "2019-04-01T12:15:00+00:00",
-        "2019-04-01T12:30:00+00:00",
-        "2019-04-01T12:45:00+00:00",
-        "2019-04-01T13:00:00+00:00",
-        "2019-04-01T13:15:00+00:00",
-        "2019-04-01T13:30:00+00:00",
-        "2019-04-01T13:45:00+00:00",
-        "2019-04-01T14:00:00+00:00",
-        "2019-04-01T14:15:00+00:00",
-        "2019-04-01T14:30:00+00:00",
-        "2019-04-01T14:45:00+00:00",
-        "2019-04-01T15:00:00+00:00",
-        "2019-04-01T15:15:00+00:00",
-        "2019-04-01T15:30:00+00:00",
-        "2019-04-01T15:45:00+00:00",
-        "2019-04-01T16:00:00+00:00",
-        "2019-04-01T16:15:00+00:00",
-        "2019-04-01T16:30:00+00:00",
-        "2019-04-01T16:45:00+00:00",
-        "2019-04-01T17:00:00+00:00",
-        "2019-04-01T17:15:00+00:00",
-        "2019-04-01T17:30:00+00:00",
-        "2019-04-01T17:45:00+00:00",
-        "2019-04-01T18:00:00+00:00",
-        "2019-04-01T18:15:00+00:00",
-        "2019-04-01T18:30:00+00:00",
-        "2019-04-01T18:45:00+00:00",
-        "2019-04-01T19:00:00+00:00",
-        "2019-04-01T19:15:00+00:00",
-        "2019-04-01T19:30:00+00:00",
-        "2019-04-01T19:45:00+00:00",
-        "2019-04-01T20:00:00+00:00",
-        "2019-04-01T20:15:00+00:00",
-        "2019-04-01T20:30:00+00:00",
-        "2019-04-01T20:45:00+00:00",
-        "2019-04-01T21:00:00+00:00",
-        "2019-04-01T21:15:00+00:00",
-        "2019-04-01T21:30:00+00:00",
-        "2019-04-01T21:45:00+00:00",
-        "2019-04-01T22:00:00+00:00",
-        "2019-04-01T22:15:00+00:00",
-        "2019-04-01T22:30:00+00:00",
-        "2019-04-01T22:45:00+00:00",
-        "2019-04-01T23:00:00+00:00",
-        "2019-04-01T23:15:00+00:00",
-        "2019-04-01T23:30:00+00:00",
-        "2019-04-01T23:45:00+00:00"
-      ]
+      timesteps: createTimeSteps(epanetResults.prolog.reportingPeriods)
     }
   };
 
@@ -234,9 +163,10 @@ function readLine(
       return coordinates(epanetData, currLine);
     case "[VERTICES]":
       return vertices(epanetData, currLine);
+    case "[PUMPS]":
+      return pumps(epanetData, currLine);
     case "[TANKS]":
-      console.log("Will do soon");
-      return epanetData;
+      return tanks(epanetData, currLine);
     default:
       return epanetData;
   }
@@ -326,6 +256,30 @@ function reservoirs(epanetData: EpanetData, currLine: string): EpanetData {
   return epanetData;
 }
 
+function tanks(epanetData: EpanetData, currLine: string): EpanetData {
+  const data = currLine.split(" ");
+
+  epanetData.nodes[data[0]] = {
+    objType: "tank",
+    table: "wn_tank",
+    node_id: data[0],
+    x: 0,
+    y: 0,
+    z: parseFloat(data[1]),
+    InitLvl: parseFloat(data[2]),
+    MinLvl: parseFloat(data[3]),
+    MaxLvl: parseFloat(data[4]),
+    Diam: parseFloat(data[5]),
+    MinVol: parseFloat(data[6]),
+    VolCurve: data[7],
+    index: epanetData.nodeIndex
+  };
+
+  epanetData.nodeIndex++;
+
+  return epanetData;
+}
+
 function pipes(epanetData: EpanetData, currLine: string): EpanetData {
   const data = currLine.split(" ");
 
@@ -340,6 +294,23 @@ function pipes(epanetData: EpanetData, currLine: string): EpanetData {
     roughness: parseFloat(data[5]),
     minorLoss: parseFloat(data[6]),
     status: data[7],
+    index: epanetData.linkIndex
+  };
+
+  epanetData.linkIndex++;
+
+  return epanetData;
+}
+
+function pumps(epanetData: EpanetData, currLine: string): EpanetData {
+  const data = currLine.split(" ");
+
+  epanetData.links[data[0]] = {
+    objType: "pump",
+    table: "wn_pumping_station",
+    us_node_id: data[1],
+    ds_node_id: data[2],
+    link_suffix: "1",
     index: epanetData.linkIndex
   };
 
@@ -395,4 +366,12 @@ function vertices(epanetData: EpanetData, currLine: string): EpanetData {
   };
 
   return epanetData;
+}
+
+function createTimeSteps(periods: number): string[] {
+  const dateObj = new Date(2019, 0, 0);
+
+  return [...Array(periods)].map((_, i) => {
+    return new Date(dateObj.getTime() + i * 900000).toISOString();
+  });
 }
