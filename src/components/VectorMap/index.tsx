@@ -8,6 +8,7 @@ import ReactMapGL, {
 import { fromJS } from "immutable";
 import {
   OsZoomStackLight,
+  BlankMap,
   MapboxStyle,
   HydrantStyle,
   MainStyle,
@@ -101,9 +102,13 @@ class VectorMap extends Component<VectorMapProps, VectorMapState> {
     ]);
     const wn_meter = extractAssetType(geoJson, ["wn_meter"]);
     const wn_valve = extractAssetType(geoJson, ["wn_valve"]);
-
+    // TODO: Clean up!!
     const usingOsBaseMap = this.props.projectionString === britishNationalGrid;
-    const baseStyle = usingOsBaseMap ? OsZoomStackLight : MapboxStyle;
+    const baseStyle = usingOsBaseMap
+      ? OsZoomStackLight
+      : this.props.projectionString === "METERS"
+      ? BlankMap
+      : MapboxStyle;
     const immutBase = fromJS(baseStyle); //)
     const mapStyle = immutBase
       .setIn(
@@ -183,12 +188,15 @@ class VectorMap extends Component<VectorMapProps, VectorMapState> {
       padding: 20
     });
 
+    const transitionDuration =
+      this.props.projectionString === "METERS" ? 0 : 50000;
+
     const viewport = {
       ...this.state.viewport,
       longitude,
       latitude,
       zoom,
-      transitionDuration: 7000,
+      transitionDuration,
       transitionInterpolator: new FlyToInterpolator(),
       transitionEasing: easeCubic
     };

@@ -1,0 +1,35 @@
+{
+  "version": 8,
+  "name": "Blank",
+  "metadata": {
+    "mapbox:autocomposite": true,
+    "mapbox:type": "template",
+    "mapbox:sdk-support": {
+      "js": "0.50.0",
+      "android": "6.7.0",
+      "ios": "4.6.0"
+    }
+  },
+  "center": [
+    -1.464858786792547,
+    50.939150779110975
+  ],
+  "zoom": 13.12365211904204,
+  "bearing": -0.44200633613297663,
+  "pitch": 0,
+  "light": {
+    "intensity": 0.25,
+    "color": "hsl(0, 0%, 100%)"
+  },
+  "sprite": "mapbox://sprites/mapbox/basic-v8",
+  "glyphs": "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
+  "layers": [
+    {
+      "id": "background",
+      "type": "background",
+      "paint": {
+        "background-color": "#e6e5e1"
+      }
+    }
+  ]
+}
