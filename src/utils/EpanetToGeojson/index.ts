@@ -1,5 +1,5 @@
 import { featureCollection, feature, Feature } from "@turf/helpers";
-import { EpanetResults, NodeResults, LinkResults } from "../EpanetBinary";
+import { EpanetResults } from "../EpanetBinary";
 
 import ModelFeatureCollection from "../../interfaces/ModelFeatureCollection";
 
@@ -98,25 +98,14 @@ export function toGeoJson(
 
   const nodeFeatures = Object.values(data.nodes).reduce(
     (previousValue, currentValue, currentIndex) => {
-      return previousValue.concat(
-        pointFeature(
-          currentValue,
-          epanetResults.results.nodes[currentValue.index]
-        )
-      );
+      return previousValue.concat(pointFeature(currentValue));
     },
     [] as Feature[]
   );
 
   const linkFeatures = Object.values(data.links).reduce(
     (previousValue, currentValue, currentIndex) => {
-      return previousValue.concat(
-        lineFeature(
-          currentValue,
-          data,
-          epanetResults.results.links[currentValue.index]
-        )
-      );
+      return previousValue.concat(lineFeature(currentValue, data));
     },
     [] as Feature[]
   );
@@ -172,25 +161,20 @@ function readLine(
   }
 }
 
-function pointFeature(node: Node, result: NodeResults): Feature {
+function pointFeature(node: Node): Feature {
   const geometry = {
     type: "Point",
     coordinates: [node.x, node.y]
   };
 
   const props = {
-    ...node,
-    ...result
+    ...node
   };
 
   return feature(geometry, props);
 }
 
-function lineFeature(
-  link: Link,
-  epanetData: EpanetData,
-  result: LinkResults
-): Feature {
+function lineFeature(link: Link, epanetData: EpanetData): Feature {
   const us = [
     epanetData.nodes[link.us_node_id].x,
     epanetData.nodes[link.us_node_id].y
@@ -210,8 +194,7 @@ function lineFeature(
   };
 
   const props = {
-    ...link,
-    ...result
+    ...link
   };
 
   delete props.bends;
