@@ -48,10 +48,7 @@ const Landing: FunctionComponent<LandingProperties> = ({
           <>
             <p className="subtitle">Share and view models in the browser</p>
             <p className="blurb"></p>
-            <p className="blurb">
-              View InfoWorks WS Pro model extracts or run and view EPANET water
-              models online.
-            </p>
+            <p className="blurb">View EPANET watermodels online.</p>
             <p className="blurb">
               Model View is under active development, this version is an early
               preview. This application and its source code is free and open
@@ -62,7 +59,7 @@ const Landing: FunctionComponent<LandingProperties> = ({
             </p>
 
             <div className="droparea">
-              <p>Drop EPANET .inp file or IW WS Pro model extract here</p>
+              <p>Drop EPANET .inp file here</p>
               <p className="blurb">
                 All data is proccessed client side, no model data sent to the
                 server.
@@ -76,15 +73,6 @@ const Landing: FunctionComponent<LandingProperties> = ({
               </Button>
             </div>
             <div className="btns-float-left">
-              <Button
-                className={classes.button}
-                variant="contained"
-                color="primary"
-                href="https://github.com/modelcreate/model-view/tree/master/ruby"
-              >
-                Model Extract Guide
-              </Button>
-
               <Button
                 className={classes.button}
                 variant="contained"

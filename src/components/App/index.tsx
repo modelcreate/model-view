@@ -3,6 +3,8 @@ import ModelDropZone from "../ModelDropZone";
 import VectorMap from "../VectorMap";
 import Landing from "../Landing";
 import ModelInfo, { ModelInfoSetting } from "../ModelInfo";
+import { EpanetResults } from "../../utils/EpanetBinary";
+
 import ModelFeatureCollection from "../../interfaces/ModelFeatureCollection";
 import "./index.css";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -130,6 +132,7 @@ type Props = {};
 
 interface AppState {
   modelGeoJson?: FeatureCollection<Geometries, Properties>;
+  epanetResults?: EpanetResults;
   isLoading: boolean;
   isFileLoaded: boolean;
   projectionString: string;
@@ -157,13 +160,14 @@ class App extends Component<Props, AppState> {
       });
   };
 
-  droppedJson = (file: ModelFeatureCollection) => {
+  droppedJson = (file: [ModelFeatureCollection, EpanetResults]) => {
     this.setState(prevState => ({
       isFileLoaded: true,
-      modelGeoJson: file,
+      modelGeoJson: file[0],
+      epanetResults: file[1],
       setting: {
         ...prevState.setting,
-        timesteps: file.model.timesteps.map(t => new Date(t.substr(0, 16)))
+        timesteps: file[0].model.timesteps.map(t => new Date(t.substr(0, 16)))
       }
     }));
   };
@@ -177,12 +181,28 @@ class App extends Component<Props, AppState> {
   };
 
   _updateSelectedFeature = (value: Feature) => {
-    if (value.properties !== null) {
+    if (value.properties !== null && this.state.epanetResults) {
       const selectedFeature: { [name: string]: any } = value.properties;
+
+      const type = value.geometry && value.geometry.type;
+
+      let tsv = {};
+      const index = value.properties.index;
+      if (type === "Point") {
+        tsv = this.state.epanetResults.results.nodes[index];
+      } else if (type === "LineString") {
+        tsv = this.state.epanetResults.results.links[index];
+      }
+
+      const props = {
+        ...selectedFeature,
+        ...tsv
+      };
+
       this.setState(prevState => ({
         setting: {
           ...prevState.setting,
-          selectedFeature
+          selectedFeature: props
         }
       }));
     }

@@ -1,9 +1,9 @@
 import { useDropzone } from "react-dropzone";
 import React, { useMemo, useCallback, FunctionComponent } from "react";
 import { runEpanet } from "../../utils/epanet";
+import { EpanetResults } from "../../utils/EpanetBinary";
 
 import ModelFeatureCollection from "../../interfaces/ModelFeatureCollection";
-import { geojsonType } from "@turf/invariant";
 
 const overlayStyle = {
   position: "absolute",
@@ -38,7 +38,7 @@ const rejectStyle = {
 };
 
 type ModelDropZone = {
-  onDroppedJson: (file: ModelFeatureCollection) => void;
+  onDroppedJson: (file: [ModelFeatureCollection, EpanetResults]) => void;
 };
 
 const ModelDropZone: FunctionComponent<ModelDropZone> = ({
@@ -51,16 +51,7 @@ const ModelDropZone: FunctionComponent<ModelDropZone> = ({
         const reader = new FileReader();
         reader.onload = () => {
           if (typeof reader.result === "string") {
-            const geoJson = runEpanet(reader.result, onDroppedJson);
-
-            //  const geoJson: ModelFeatureCollection = JSON.parse(reader.result);
-            //  try {
-            //    geojsonType(geoJson, "FeatureCollection", "Drop Zone");
-            //    onDroppedJson(geoJson);
-            //  } catch (e) {
-            //    console.log(e);
-            //    // TODO: Handle if dropped bad JSON data
-            //  }
+            runEpanet(reader.result, onDroppedJson);
           }
         };
 
