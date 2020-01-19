@@ -156,7 +156,21 @@ class App extends Component<Props, AppState> {
     )
       .then(res => res.json())
       .then(body => {
-        this.droppedJson(body);
+        const epaResults: EpanetResults = {
+          prolog: {
+            nodeCount: 0,
+            resAndTankCount: 0,
+            linkCount: 0,
+            pumpCount: 0,
+            valveCount: 0,
+            reportingPeriods: 0
+          },
+          results: {
+            nodes: [],
+            links: []
+          }
+        };
+        this.droppedJson([body, epaResults]);
       });
   };
 
