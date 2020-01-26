@@ -4,7 +4,7 @@ import VectorMap from "../VectorMap";
 import Landing from "../Landing";
 import ModelInfo, { ModelInfoSetting } from "../ModelInfo";
 import { EpanetResults } from "../../utils/EpanetBinary";
-
+import { reprojectFeatureCollection } from "../../utils/reproject";
 import ModelFeatureCollection from "../../interfaces/ModelFeatureCollection";
 import "./index.css";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -133,6 +133,10 @@ type Props = {};
 interface AppState {
   modelGeoJson?: FeatureCollection<Geometries, Properties>;
   epanetResults?: EpanetResults;
+  viz: {
+    coord: [number, number];
+    value: number;
+  }[];
   isLoading: boolean;
   isFileLoaded: boolean;
   projectionString: string;
@@ -144,7 +148,8 @@ class App extends Component<Props, AppState> {
     isLoading: false,
     isFileLoaded: false,
     projectionString: "",
-    setting
+    setting,
+    viz: []
   };
 
   loadDemo = () => {
@@ -185,12 +190,45 @@ class App extends Component<Props, AppState> {
       }
     }));
   };
+
+  _getViz = (
+    json: ModelFeatureCollection,
+    results: EpanetResults,
+    timestep: number
+  ) => {
+    const nodeResults = json.features.filter(
+      f => f.geometry && f.geometry.type === "Point"
+    );
+
+    const returnValue = nodeResults.reduce((acc, cur) => {
+      const data = {
+        //@ts-ignore
+        coord: [cur.geometry.coordinates[0], cur.geometry.coordinates[1]],
+        //@ts-ignore
+        value: results.results.nodes[cur.properties.index].pressure[timestep]
+      };
+      //@ts-ignore
+      return acc.concat(data);
+    }, [] as { coord: [number, number]; value: number }[]);
+
+    console.log(returnValue);
+    return returnValue;
+  };
+
   _updateSettings = (value: string) => {
+    const test = this._getViz(
+      //@ts-ignore
+      this.state.modelGeoJson,
+      this.state.epanetResults,
+      parseInt(value)
+    );
+
     this.setState(prevState => ({
       setting: {
         ...prevState.setting,
         currentTimestep: parseInt(value)
-      }
+      },
+      viz: test
     }));
   };
 
@@ -232,7 +270,26 @@ class App extends Component<Props, AppState> {
   };
 
   _updateProjectionString = (projectionString: string) => {
-    this.setState(prevState => ({ projectionString, isLoading: true }));
+    this.setState(
+      prevState => ({
+        projectionString,
+        modelGeoJson: reprojectFeatureCollection(
+          //@ts-ignore
+          prevState.modelGeoJson,
+          projectionString
+        ),
+        isLoading: true
+      }),
+      () => {
+        const test = this._getViz(
+          //@ts-ignore
+          this.state.modelGeoJson,
+          this.state.epanetResults,
+          this.state.setting.currentTimestep
+        );
+        this.setState(prevState => ({ viz: test }));
+      }
+    );
   };
 
   render() {
@@ -241,7 +298,8 @@ class App extends Component<Props, AppState> {
       isFileLoaded,
       modelGeoJson,
       setting,
-      projectionString
+      projectionString,
+      viz
     } = this.state;
 
     return (
@@ -254,6 +312,7 @@ class App extends Component<Props, AppState> {
                   projectionString={projectionString}
                   onSelectFeature={this._updateSelectedFeature}
                   modelGeoJson={modelGeoJson}
+                  viz={viz}
                 />
                 <ModelInfo
                   settings={setting}

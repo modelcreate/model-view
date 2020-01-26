@@ -1,4 +1,7 @@
 import React, { Component } from "react";
+import DeckGL from "@deck.gl/react";
+import { ContourLayer } from "@deck.gl/aggregation-layers";
+
 import StaticMap, {
   PointerEvent,
   ExtraState,
@@ -32,6 +35,10 @@ import WebMercatorViewport from "viewport-mercator-project";
 const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 
 type VectorMapProps = {
+  viz: {
+    coord: [number, number];
+    value: number;
+  }[];
   projectionString: string;
   modelGeoJson: FeatureCollection<Geometries, Properties>;
   onSelectFeature: (value: Feature) => void;
@@ -54,9 +61,78 @@ const extractAssetType = (geoJson: FeatureCollection, types: string[]) => {
   );
   return featureCollection(filteredFeatures);
 };
+const INITIAL_VIEW_STATE = {
+  latitude: 47.65,
+  longitude: 7,
+  zoom: 4.5,
+  maxZoom: 16,
+  //pitch: 50,
+  bearing: 0
+};
+
+const data: {
+  ADDRESS: string;
+  RACKS: number;
+  SPACES: number;
+  COORDINATES: [number, number];
+}[] = [
+  {
+    ADDRESS: "939 ELLIS ST",
+    RACKS: 2,
+    SPACES: 4,
+    COORDINATES: [-122.42177834, 37.78346622]
+  },
+  {
+    ADDRESS: "1380 HOWARD ST",
+    RACKS: 1,
+    SPACES: 2,
+    COORDINATES: [-122.414411, 37.774458]
+  },
+  {
+    ADDRESS: "1195 OAK ST",
+    RACKS: 1,
+    SPACES: 2,
+    COORDINATES: [-122.438887, 37.772737]
+  },
+  {
+    ADDRESS: "1387 VALENCIA ST",
+    RACKS: 1,
+    SPACES: 2,
+    COORDINATES: [-122.42019976, 37.75087429]
+  },
+  {
+    ADDRESS: "180 TOWNSEND ST",
+    RACKS: 1,
+    SPACES: 2,
+    COORDINATES: [-122.392606, 37.779369]
+  }
+];
+
+const CONTOURS = [
+  { threshold: 1, color: [255, 0, 0, 255], strokeWidth: 1 }, // => Isoline for threshold 1
+  { threshold: 20, color: [0, 255, 0], strokeWidth: 2 }, // => Isoline for threshold 5
+  { threshold: 25, color: [0, 0, 255], strokeWidth: 2 }, // => Isoline for threshold 5
+  { threshold: [0, 20], color: [255, 0, 0, 128] } // => Isoband for threshold range [6, 10)
+];
 
 class VectorMap extends Component<VectorMapProps, VectorMapState> {
   _map: mapboxgl.Map | null = null;
+
+  _getDeckLayers = () => {
+    const layer = new ContourLayer({
+      id: "contourLayer",
+      // Three contours are rendered.
+      contours: CONTOURS,
+      data: this.props.viz,
+      //@ts-ignore
+      aggregation: "MEAN",
+      cellSize: 50,
+      getPosition: d => d.coord,
+      getWeight: d => d.value
+    });
+
+    return [layer];
+  };
 
   _addImage = () => {
     if (this._map !== null) {
@@ -79,19 +155,20 @@ class VectorMap extends Component<VectorMapProps, VectorMapState> {
         );
       }
 
-      const json = this.state.mapStyle.toJS();
-      const jsonbbox = bbox(json.sources.mains.data);
-      this._goToBBox(jsonbbox);
+      //const json = this.state.mapStyle.toJS();
+      //const jsonbbox = bbox(json.sources.mains.data);
+      //this._goToBBox(jsonbbox);
     }
   };
 
   _createStyles = () => {
     const britishNationalGrid =
       "+proj=tmerc +lat_0=49 +lon_0=-2 +k=0.9996012717 +x_0=400000 +y_0=-100000 +datum=OSGB36 +units=m +no_defs";
-    const geoJson = reprojectFeatureCollection(
-      this.props.modelGeoJson,
-      this.props.projectionString
-    );
+    //const geoJson = reprojectFeatureCollection(
+    //  this.props.modelGeoJson,
+    //  this.props.projectionString
+    //);
+    const geoJson = this.props.modelGeoJson;
     console.log(geoJson);
 
     const wn_hydrant = extractAssetType(geoJson, ["wn_hydrant"]);
@@ -213,28 +290,34 @@ class VectorMap extends Component<VectorMapProps, VectorMapState> {
     const { mapStyle } = this.state;
 
     return (
-      <StaticMap
-        mapboxApiAccessToken={MAPBOX_TOKEN}
-        {...this.state.viewport}
-        mapStyle={mapStyle}
-        ref={ref => {
-          if (ref && ref.getMap()) {
-            this._map = ref.getMap();
-          }
-        }}
-        onViewportChange={this._onViewportChange}
-        onLoad={() => {
-          this._addImage();
-        }}
-        attributionControl={true}
-        onClick={this._onClick}
-        getCursor={this._getCursor}
+      <DeckGL
+        initialViewState={INITIAL_VIEW_STATE}
         width="100%"
         height="100vh"
-        maxZoom={24}
-        interactiveLayerIds={this.state.interactiveLayerIds}
-        clickRadius={2}
-      />
+        controller={true}
+        layers={this._getDeckLayers()}
+      >
+        <StaticMap
+          mapboxApiAccessToken={MAPBOX_TOKEN}
+          {...this.state.viewport}
+          mapStyle={mapStyle}
+          ref={ref => {
+            if (ref && ref.getMap()) {
+              this._map = ref.getMap();
+            }
+          }}
+          //onViewportChange={this._onViewportChange}
+          onLoad={() => {
+            this._addImage();
+          }}
+          attributionControl={true}
+          onClick={this._onClick}
+          getCursor={this._getCursor}
+          maxZoom={24}
+          interactiveLayerIds={this.state.interactiveLayerIds}
+          clickRadius={2}
+        />
+      </DeckGL>
     );
   }
 }

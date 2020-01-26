@@ -32,7 +32,6 @@ class SelectProjection extends React.Component<
   };
   getOptions = (input: string, callback: (c: OptionsType<any>) => void) => {
     const searchString = input.toLowerCase().trim();
-    console.log(searchString);
     //input.length > 0 ?
 
     const options: ProjectionOption[] = proj4List.filter(d => {
