@@ -1649,10 +1649,10 @@
     prop-types "^15.6.0"
     react-is "^16.6.3"
 
-"@model-create/epanet-engine@0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@model-create/epanet-engine/-/epanet-engine-0.2.0.tgz#068bf827ea0d71b19c1666c2dc3b6effb3f30153"
-  integrity sha512-04mMz2IFSapnCJ3qENUPZEGI0KEWeDoKSXSeFnqnJprhcWrF9K2LWdA7uVtw7wvMwS0l2sfXSuJZ1i6wFA7F0g==
+"@model-create/epanet-engine@0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@model-create/epanet-engine/-/epanet-engine-0.3.0.tgz#1dc33922643ba8c96b2cced748238aad588bfd57"
+  integrity sha512-SXYbruQIeSEgeif4ayIfDp5KIgLcgJpJSWAr0Cd1W6AVSMWrjgy+apHQ2I5wApsjiWbVQE4eY52eI27ATyWcOw==
 
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
@@ -5841,12 +5841,12 @@ entities@^1.1.1:
   resolved "https://registry.yarnpkg.com/entities/-/entities-1.1.2.tgz#bdfa735299664dfafd34529ed4f8522a275fea56"
   integrity sha512-f2LZMYl1Fzu7YSBKg+RoROelpOaNrcGmE9AZubeDfrCEia483oW4MI4VyFd5VNHIgQ/7qm1I0wUHK1eJnn2y2w==
 
-epanet-js@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/epanet-js/-/epanet-js-0.2.0.tgz#8b2014cbc85d2b02c9220faaa390cebdf3233f43"
-  integrity sha512-pINVu/qC9JKl3nUdu8e7ptayWZ4YSO2ddDyEBqj4eSQyCkOTw5SfvH2eaugNlRTwniY2OXqlQcrcRwq2O4xvVw==
+epanet-js@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/epanet-js/-/epanet-js-0.3.0.tgz#67ddb84fadaa1ac7b6e31c58e22380af2694202c"
+  integrity sha512-7yqkGyYikIE1T6OpjaWr6Er/4vH8Le/60xvUIGkzCogkZJNhJUkLm2c3iFu23T+JPk8LYnlhPumr8NcYun+Qwg==
   dependencies:
-    "@model-create/epanet-engine" "0.2.0"
+    "@model-create/epanet-engine" "0.3.0"
 
 errno@^0.1.3, errno@~0.1.7:
   version "0.1.7"
