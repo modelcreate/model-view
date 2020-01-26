@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import ReactMapGL, {
+import StaticMap, {
   PointerEvent,
   ExtraState,
   ViewState,
@@ -184,9 +184,15 @@ class VectorMap extends Component<VectorMapProps, VectorMapState> {
   _goToBBox = (jsonbbox: BBox) => {
     const { longitude, latitude, zoom } = new WebMercatorViewport(
       this.state.viewport
-    ).fitBounds([[jsonbbox[0], jsonbbox[1]], [jsonbbox[2], jsonbbox[3]]], {
-      padding: 20
-    });
+    ).fitBounds(
+      [
+        [jsonbbox[0], jsonbbox[1]],
+        [jsonbbox[2], jsonbbox[3]]
+      ],
+      {
+        padding: 20
+      }
+    );
 
     const transitionDuration =
       this.props.projectionString === "METERS" ? 0 : 7000;
@@ -207,7 +213,7 @@ class VectorMap extends Component<VectorMapProps, VectorMapState> {
     const { mapStyle } = this.state;
 
     return (
-      <ReactMapGL
+      <StaticMap
         mapboxApiAccessToken={MAPBOX_TOKEN}
         {...this.state.viewport}
         mapStyle={mapStyle}
@@ -228,7 +234,7 @@ class VectorMap extends Component<VectorMapProps, VectorMapState> {
         maxZoom={24}
         interactiveLayerIds={this.state.interactiveLayerIds}
         clickRadius={2}
-      ></ReactMapGL>
+      />
     );
   }
 }
