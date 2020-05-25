@@ -13,7 +13,7 @@ import "./index.css";
 const styles = (theme: Theme) =>
   createStyles({
     button: {
-      margin: theme.spacing.unit
+      //margin: theme.spacing.unit 
     },
     input: {
       display: "none"

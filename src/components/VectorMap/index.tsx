@@ -1,10 +1,5 @@
 import React, { Component } from "react";
-import ReactMapGL, {
-  PointerEvent,
-  ExtraState,
-  ViewState,
-  FlyToInterpolator
-} from "react-map-gl";
+import ReactMapGL, { PointerEvent, ExtraState, ViewState } from "react-map-gl";
 import { fromJS } from "immutable";
 import {
   OsZoomStackLight,
@@ -13,7 +8,7 @@ import {
   HydrantStyle,
   MainStyle,
   MeterStyle,
-  ValveStyle
+  ValveStyle,
 } from "../../mapstyles";
 import { reprojectFeatureCollection } from "../../utils/reproject";
 import {
@@ -22,12 +17,10 @@ import {
   Geometries,
   Properties,
   featureCollection,
-  BBox
+  BBox,
 } from "@turf/helpers";
 import bbox from "@turf/bbox";
 import { AttributionControl } from "mapbox-gl";
-import { easeCubic } from "d3-ease";
-import WebMercatorViewport from "viewport-mercator-project";
 
 const MAPBOX_TOKEN = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 
@@ -49,7 +42,7 @@ interface VectorMapState {
 
 const extractAssetType = (geoJson: FeatureCollection, types: string[]) => {
   const filteredFeatures = geoJson.features.filter(
-    feature =>
+    (feature) =>
       feature.properties !== null && types.includes(feature.properties.table)
   );
   return featureCollection(filteredFeatures);
@@ -74,14 +67,14 @@ class VectorMap extends Component<VectorMapProps, VectorMapState> {
         this._map.addControl(
           new AttributionControl({
             customAttribution:
-              "Contains OS data © Crown copyright and database right 2019"
+              "Contains OS data © Crown copyright and database right 2019",
           })
         );
       }
 
-      const json = this.state.mapStyle.toJS();
-      const jsonbbox = bbox(json.sources.mains.data);
-      this._goToBBox(jsonbbox);
+      //const json = this.state.mapStyle.toJS();
+      //const jsonbbox = bbox(json.sources.mains.data);
+      //this._goToBBox(jsonbbox);
     }
   };
 
@@ -98,7 +91,7 @@ class VectorMap extends Component<VectorMapProps, VectorMapState> {
     const wn_pipe = extractAssetType(geoJson, [
       "wn_pipe",
       "wn_meter",
-      "wn_valve"
+      "wn_valve",
     ]);
     const wn_meter = extractAssetType(geoJson, ["wn_meter"]);
     const wn_valve = extractAssetType(geoJson, ["wn_valve"]);
@@ -137,11 +130,11 @@ class VectorMap extends Component<VectorMapProps, VectorMapState> {
     viewport: {
       latitude: 0, //56.83955911423721,
       longitude: 0, //,//-2.287646619512958,
-      zoom: 0
+      zoom: 0,
     },
     mapStyle: this._createStyles(),
     interactiveLayerIds: ["hydrants-geojson", "main-geojson"],
-    usingOsBaseMap: false
+    usingOsBaseMap: false,
   };
 
   _getCursor = (event: ExtraState) => {
@@ -157,9 +150,9 @@ class VectorMap extends Component<VectorMapProps, VectorMapState> {
         us_node_id,
         ds_node_id,
         link_suffix,
-        node_id
+        node_id,
       } = feature.properties;
-      const feat = this.props.modelGeoJson.features.find(f => {
+      const feat = this.props.modelGeoJson.features.find((f) => {
         if (f.properties !== null) {
           if (f.properties.us_node_id !== undefined) {
             return (
@@ -182,25 +175,30 @@ class VectorMap extends Component<VectorMapProps, VectorMapState> {
   };
 
   _goToBBox = (jsonbbox: BBox) => {
-    const { longitude, latitude, zoom } = new WebMercatorViewport(
-      this.state.viewport
-    ).fitBounds([[jsonbbox[0], jsonbbox[1]], [jsonbbox[2], jsonbbox[3]]], {
-      padding: 20
-    });
-
-    const transitionDuration =
-      this.props.projectionString === "METERS" ? 0 : 7000;
-
-    const viewport = {
-      ...this.state.viewport,
-      longitude,
-      latitude,
-      zoom,
-      transitionDuration,
-      transitionInterpolator: new FlyToInterpolator(),
-      transitionEasing: easeCubic
-    };
-    this.setState({ viewport });
+    //const { longitude, latitude, zoom } = new WebMercatorViewport(
+    //  this.state.viewport
+    //).fitBounds(
+    //  [
+    //    [jsonbbox[0], jsonbbox[1]],
+    //    [jsonbbox[2], jsonbbox[3]],
+    //  ],
+    //  {
+    //    padding: 20,
+    //  }
+    //    );
+    //
+    //    const transitionDuration =
+    //      this.props.projectionString === "METERS" ? 0 : 7000;
+    //
+    //    const viewport = {
+    //      ...this.state.viewport,
+    //      longitude,
+    //      latitude,
+    //      zoom,
+    //      transitionDuration,
+    //      transitionInterpolator: new FlyToInterpolator(),
+    //    };
+    //    this.setState({ viewport });
   };
 
   render() {
@@ -211,7 +209,7 @@ class VectorMap extends Component<VectorMapProps, VectorMapState> {
         mapboxApiAccessToken={MAPBOX_TOKEN}
         {...this.state.viewport}
         mapStyle={mapStyle}
-        ref={ref => {
+        ref={(ref) => {
           if (ref && ref.getMap()) {
             this._map = ref.getMap();
           }

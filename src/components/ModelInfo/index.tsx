@@ -7,7 +7,7 @@ import "./index.css";
 type DefaultContainer = {};
 
 const DefaultContainer: FunctionComponent<DefaultContainer> = ({
-  children
+  children,
 }) => <div className="control-panel">{children}</div>;
 
 export interface ModelInfoSetting {
@@ -26,13 +26,13 @@ type ModelInfoProps = {
 const ModelInfo: FunctionComponent<ModelInfoProps> = ({
   settings,
   onChange,
-  onClearSelected
+  onClearSelected,
 }) => {
   return (
     <DefaultContainer>
       <div className="time-controls">
         <h2>
-          {format(settings.timesteps[settings.currentTimestep], "Do MMMM YY")}
+          {format(settings.timesteps[settings.currentTimestep], "Do MMMM yy")}
         </h2>
         <h1>{format(settings.timesteps[settings.currentTimestep], "HH:mm")}</h1>
         <div className="input">
@@ -42,7 +42,7 @@ const ModelInfo: FunctionComponent<ModelInfoProps> = ({
             min={0}
             max={settings.timesteps.length - 1}
             step={1}
-            onChange={evt => onChange(evt.target.value)}
+            onChange={(evt) => onChange(evt.target.value)}
           />
         </div>
       </div>
@@ -54,7 +54,7 @@ const ModelInfo: FunctionComponent<ModelInfoProps> = ({
           key={settings.selectedFeature.us_node_id}
           feature={settings}
           tsv={Object.keys(settings.selectedFeature).filter(
-            key =>
+            (key) =>
               settings.selectedFeature &&
               settings.selectedFeature[key].constructor === Array
           )}
