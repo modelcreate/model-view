@@ -2,7 +2,7 @@ import {
   FeatureCollection,
   Geometries,
   Properties,
-  Feature
+  Feature,
 } from "@turf/helpers";
 import { featureReduce, coordEach, coordReduce } from "@turf/meta";
 import clone from "@turf/clone";
@@ -12,14 +12,14 @@ import proj4 from "proj4";
 export function reprojectFeatureCollection(
   geoJson: FeatureCollection<Geometries, Properties>,
   fromProject: string
-): FeatureCollection {
+): FeatureCollection<Geometries, Properties> {
   const proj = fromProject === "METERS" ? generateProj(geoJson) : fromProject;
 
   const initialValue: Array<Feature> = [];
 
   const features = featureReduce(
     geoJson,
-    function(previousValue, currentFeature, featureIndex) {
+    function (previousValue, currentFeature, featureIndex) {
       const featureReproject = Object.assign(
         {},
         currentFeature,
@@ -39,7 +39,7 @@ export function reprojectFeature(
 ): Feature<Geometries, Properties> {
   const newFeature = clone(feature);
 
-  coordEach(newFeature, function(currentCoord) {
+  coordEach(newFeature, function (currentCoord) {
     const newCoord = reprojectCoord(currentCoord, fromProject);
     currentCoord[0] = newCoord[0];
     currentCoord[1] = newCoord[1];
@@ -78,7 +78,7 @@ function generateProj(
 ): string {
   const minXY = coordReduce(
     geoJson,
-    function(previousValue, currentCoord) {
+    function (previousValue, currentCoord) {
       const minX =
         currentCoord[0] < previousValue[0] ? currentCoord[0] : previousValue[0];
       const minY =
