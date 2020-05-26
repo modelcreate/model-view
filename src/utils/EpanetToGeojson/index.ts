@@ -88,7 +88,7 @@ export function toGeoJson(
     nodeIndex: 0,
     linkIndex: 0,
     nodes: {},
-    links: {}
+    links: {},
   };
 
   const lines = inpFile.split("\n");
@@ -115,8 +115,8 @@ export function toGeoJson(
   const model: ModelFeatureCollection = {
     ...fc,
     model: {
-      timesteps: createTimeSteps(epanetResults.prolog.reportingPeriods)
-    }
+      timesteps: createTimeSteps(epanetResults.prolog.reportingPeriods),
+    },
   };
 
   return model;
@@ -164,11 +164,11 @@ function readLine(
 function pointFeature(node: Node): Feature {
   const geometry = {
     type: "Point",
-    coordinates: [node.x, node.y]
+    coordinates: [node.x, node.y],
   };
 
   const props = {
-    ...node
+    ...node,
   };
 
   return feature(geometry, props);
@@ -177,11 +177,11 @@ function pointFeature(node: Node): Feature {
 function lineFeature(link: Link, epanetData: EpanetData): Feature {
   const us = [
     epanetData.nodes[link.us_node_id].x,
-    epanetData.nodes[link.us_node_id].y
+    epanetData.nodes[link.us_node_id].y,
   ];
   const ds = [
     epanetData.nodes[link.ds_node_id].x,
-    epanetData.nodes[link.ds_node_id].y
+    epanetData.nodes[link.ds_node_id].y,
   ];
 
   const bends = link.bends
@@ -190,11 +190,11 @@ function lineFeature(link: Link, epanetData: EpanetData): Feature {
 
   const geometry = {
     type: "LineString",
-    coordinates: bends
+    coordinates: bends,
   };
 
   const props = {
-    ...link
+    ...link,
   };
 
   delete props.bends;
@@ -212,7 +212,7 @@ function junctions(epanetData: EpanetData, currLine: string): EpanetData {
     x: 0,
     y: 0,
     z: parseFloat(data[1]),
-    index: epanetData.nodeIndex
+    index: epanetData.nodeIndex,
   };
 
   epanetData.nodeIndex++;
@@ -231,7 +231,7 @@ function reservoirs(epanetData: EpanetData, currLine: string): EpanetData {
     y: 0,
     z: parseFloat(data[1]),
     profile: data[2],
-    index: epanetData.nodeIndex
+    index: epanetData.nodeIndex,
   };
 
   epanetData.nodeIndex++;
@@ -255,7 +255,7 @@ function tanks(epanetData: EpanetData, currLine: string): EpanetData {
     Diam: parseFloat(data[5]),
     MinVol: parseFloat(data[6]),
     VolCurve: data[7],
-    index: epanetData.nodeIndex
+    index: epanetData.nodeIndex,
   };
 
   epanetData.nodeIndex++;
@@ -277,7 +277,7 @@ function pipes(epanetData: EpanetData, currLine: string): EpanetData {
     roughness: parseFloat(data[5]),
     minorLoss: parseFloat(data[6]),
     status: data[7],
-    index: epanetData.linkIndex
+    index: epanetData.linkIndex,
   };
 
   epanetData.linkIndex++;
@@ -294,7 +294,7 @@ function pumps(epanetData: EpanetData, currLine: string): EpanetData {
     us_node_id: data[1],
     ds_node_id: data[2],
     link_suffix: "1",
-    index: epanetData.linkIndex
+    index: epanetData.linkIndex,
   };
 
   epanetData.linkIndex++;
@@ -315,7 +315,7 @@ function valves(epanetData: EpanetData, currLine: string): EpanetData {
     type: data[4],
     setting: parseFloat(data[6]),
     minorLoss: parseFloat(data[7]),
-    index: epanetData.linkIndex
+    index: epanetData.linkIndex,
   };
 
   epanetData.linkIndex++;
@@ -329,7 +329,7 @@ function coordinates(epanetData: EpanetData, currLine: string): EpanetData {
   epanetData.nodes[data[0]] = {
     ...epanetData.nodes[data[0]],
     x: parseFloat(data[1]),
-    y: parseFloat(data[2])
+    y: parseFloat(data[2]),
   };
 
   return epanetData;
@@ -345,7 +345,7 @@ function vertices(epanetData: EpanetData, currLine: string): EpanetData {
 
   epanetData.links[data[0]] = {
     ...epanetData.links[data[0]],
-    bends
+    bends,
   };
 
   return epanetData;
