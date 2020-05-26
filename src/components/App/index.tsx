@@ -5,6 +5,7 @@ import Landing from "../Landing";
 import ModelInfo, { ModelInfoSetting } from "../ModelInfo";
 import { EpanetResults } from "../../utils/EpanetBinary";
 
+import { runEpanet } from "../../utils/epanet";
 import ModelFeatureCollection from "../../interfaces/ModelFeatureCollection";
 import "./index.css";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -12,7 +13,7 @@ import {
   FeatureCollection,
   Geometries,
   Properties,
-  Feature
+  Feature,
 } from "@turf/helpers";
 
 // TODO: Clean up and remove the requirement for settings and check for null
@@ -123,9 +124,9 @@ const setting: ModelInfoSetting = {
     "2018-01-31T23:00:00",
     "2018-01-31T23:15:00",
     "2018-01-31T23:30:00",
-    "2018-01-31T23:45:00"
-  ].map(t => new Date(t)),
-  selectedFeature: null
+    "2018-01-31T23:45:00",
+  ].map((t) => new Date(t)),
+  selectedFeature: null,
 };
 
 type Props = {};
@@ -144,53 +145,39 @@ class App extends Component<Props, AppState> {
     isLoading: false,
     isFileLoaded: false,
     projectionString: "",
-    setting
+    setting,
   };
 
   loadDemo = () => {
     const projectionString =
-      "+proj=utm +zone=55 +south +ellps=aust_SA +towgs84=-117.808,-51.536,137.784,0.303,0.446,0.234,-0.29 +units=m +no_defs";
-    this.setState(prevState => ({ projectionString, isLoading: true }));
-    fetch(
-      "https://raw.githubusercontent.com/modelcreate/model-view/master/data/MagneticIsland.json"
-    )
-      .then(res => res.json())
-      .then(body => {
-        const epaResults: EpanetResults = {
-          prolog: {
-            nodeCount: 0,
-            resAndTankCount: 0,
-            linkCount: 0,
-            pumpCount: 0,
-            valveCount: 0,
-            reportingPeriods: 0
-          },
-          results: {
-            nodes: [],
-            links: []
-          }
-        };
-        this.droppedJson([body, epaResults]);
+      "+proj=utm +zone=17 +datum=NAD83 +units=m +no_defs";
+    this.setState((prevState) => ({ projectionString, isLoading: true }));
+    fetch("static/models/example1.inp")
+      .then((res) => res.text())
+      .then((body) => {
+        runEpanet(body, this.droppedJson);
       });
   };
 
   droppedJson = (file: [ModelFeatureCollection, EpanetResults]) => {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       isFileLoaded: true,
       modelGeoJson: file[0],
       epanetResults: file[1],
       setting: {
         ...prevState.setting,
-        timesteps: file[0].model.timesteps.map(t => new Date(t.substr(0, 16)))
-      }
+        timesteps: file[0].model.timesteps.map(
+          (t) => new Date(t.substr(0, 16))
+        ),
+      },
     }));
   };
   _updateSettings = (value: string) => {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       setting: {
         ...prevState.setting,
-        currentTimestep: parseInt(value)
-      }
+        currentTimestep: parseInt(value),
+      },
     }));
   };
 
@@ -210,29 +197,29 @@ class App extends Component<Props, AppState> {
 
       const props = {
         ...selectedFeature,
-        ...tsv
+        ...tsv,
       };
 
-      this.setState(prevState => ({
+      this.setState((prevState) => ({
         setting: {
           ...prevState.setting,
-          selectedFeature: props
-        }
+          selectedFeature: props,
+        },
       }));
     }
   };
 
   _clearSelectedFeature = () => {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       setting: {
         ...prevState.setting,
-        selectedFeature: null
-      }
+        selectedFeature: null,
+      },
     }));
   };
 
   _updateProjectionString = (projectionString: string) => {
-    this.setState(prevState => ({ projectionString, isLoading: true }));
+    this.setState((prevState) => ({ projectionString, isLoading: true }));
   };
 
   render() {
@@ -241,7 +228,7 @@ class App extends Component<Props, AppState> {
       isFileLoaded,
       modelGeoJson,
       setting,
-      projectionString
+      projectionString,
     } = this.state;
 
     return (

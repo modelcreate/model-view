@@ -68,8 +68,8 @@ function VectorMap({
   const [viewport, setViewport] = useState({
     width: 400,
     height: 100,
-    latitude: -19.146445255599986,
-    longitude: 146.8447905778885,
+    latitude: 43.403673421449156,
+    longitude: -80.51306024193764,
     zoom: 14.2,
   });
 
