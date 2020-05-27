@@ -2,7 +2,7 @@ import { Project, Workspace } from "epanet-js";
 import { readBinary, EpanetResults } from "../EpanetBinary";
 import { toGeoJson } from "../EpanetToGeojson";
 
-import ModelFeatureCollection from "../../interfaces/ModelFeatureCollection";
+import EpanetGeoJSON from "../../interfaces/EpanetGeoJSON";
 
 // convert inp to geojson
 // run epanet
@@ -11,7 +11,7 @@ import ModelFeatureCollection from "../../interfaces/ModelFeatureCollection";
 
 export function runEpanet(
   fromProject: string,
-  openModel: (file: [ModelFeatureCollection, EpanetResults]) => void
+  openModel: (file: [EpanetGeoJSON, EpanetResults]) => void
 ): void {
   // Initialise a new Workspace and Project object
   const ws = new Workspace();
@@ -46,7 +46,7 @@ export function runEpanet(
   const results = readBinary(resultView);
   const t3 = performance.now();
 
-  const geoJson = toGeoJson(fromProject, results);
+  const geoJson = toGeoJson(fromProject);
   console.log(geoJson);
   console.log(results);
   console.log("Call to readBinary took " + (t3 - t2) + " milliseconds.");

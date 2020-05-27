@@ -7,10 +7,12 @@ import {
 } from "geojson";
 
 export default interface EpanetGeoJSON extends FeatureCollection<Geometry> {
-  features: EpanetFeatures[];
+  features: EpanetFeature[];
 }
 
-type EpanetFeatures = Junction | Tank | Reservior | Pipe | Valve | Pump;
+export type EpanetFeature = NodeFeature | LinkFeature;
+export type NodeFeature = Junction | Tank | Reservior;
+export type LinkFeature = Pipe | Valve | Pump;
 
 // Two parent types - Nodes and Links
 
@@ -26,27 +28,27 @@ interface Link extends Feature<LineString> {
 
 // Six main feature types
 
-interface Junction extends Node {
+export interface Junction extends Node {
   properties: JunctionProperties;
 }
 
-interface Tank extends Node {
+export interface Tank extends Node {
   properties: TankProperties;
 }
 
-interface Reservior extends Node {
+export interface Reservior extends Node {
   properties: ReservoirProperties;
 }
 
-interface Pipe extends Link {
+export interface Pipe extends Link {
   properties: PipeProperties;
 }
 
-interface Valve extends Link {
+export interface Valve extends Link {
   properties: ValveProperties;
 }
 
-interface Pump extends Link {
+export interface Pump extends Link {
   properties: PowerPumpProperties | HeadPumpProperties;
 }
 
@@ -58,7 +60,6 @@ interface NodeProperties {
   type: "Node";
   category: NodeCategories;
   id: string;
-  elevation: number;
 }
 
 interface JunctionProperties extends NodeProperties {
@@ -77,13 +78,13 @@ interface TankProperties extends NodeProperties {
   diameter: number;
   minVolume: number;
   volCurve: string;
-  overflow: boolean;
+  overflow?: boolean;
 }
 
 interface ReservoirProperties extends NodeProperties {
   category: "Reservior";
   head: number;
-  pattern: string;
+  pattern?: string;
 }
 
 // Links type properties
@@ -106,7 +107,7 @@ interface PipeProperties extends LinkProperties {
   diameter: number;
   roughness: number;
   minorLoss: number;
-  status: PipeStatus;
+  status?: PipeStatus;
 }
 
 type ValveType = "PRV" | "PSV" | "PBV" | "FCV" | "TCV" | "GPV";
@@ -133,7 +134,7 @@ interface PowerPumpProperties extends PumpProperties {
   power: number;
 }
 
-interface HeadPumpProperties extends LinkProperties {
+interface HeadPumpProperties extends PumpProperties {
   mode: "Head";
   head: string;
 }

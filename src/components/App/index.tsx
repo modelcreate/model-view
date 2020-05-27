@@ -6,7 +6,7 @@ import ModelInfo, { ModelInfoSetting } from "../ModelInfo";
 import { EpanetResults } from "../../utils/EpanetBinary";
 
 import { runEpanet } from "../../utils/epanet";
-import ModelFeatureCollection from "../../interfaces/ModelFeatureCollection";
+import EpanetGeoJSON from "../../interfaces/EpanetGeoJSON";
 import "./index.css";
 import "mapbox-gl/dist/mapbox-gl.css";
 import {
@@ -159,16 +159,17 @@ class App extends Component<Props, AppState> {
       });
   };
 
-  droppedJson = (file: [ModelFeatureCollection, EpanetResults]) => {
+  droppedJson = (file: [EpanetGeoJSON, EpanetResults]) => {
     this.setState((prevState) => ({
+      projectionString: "+proj=utm +zone=17 +datum=NAD83 +units=m +no_defs", //Temp set
       isFileLoaded: true,
       modelGeoJson: file[0],
       epanetResults: file[1],
       setting: {
         ...prevState.setting,
-        timesteps: file[0].model.timesteps.map(
-          (t) => new Date(t.substr(0, 16))
-        ),
+        //timesteps: file[0].model.timesteps.map(
+        //  (t) => new Date(t.substr(0, 16))
+        //),
       },
     }));
   };
@@ -188,10 +189,10 @@ class App extends Component<Props, AppState> {
       const type = value.geometry && value.geometry.type;
 
       let tsv = {};
-      const index = value.properties.index;
-      if (type === "Point") {
+      const index = value.id;
+      if (typeof index === "number" && type === "Point") {
         tsv = this.state.epanetResults.results.nodes[index];
-      } else if (type === "LineString") {
+      } else if (typeof index === "number" && type === "LineString") {
         tsv = this.state.epanetResults.results.links[index];
       }
 

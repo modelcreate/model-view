@@ -7,7 +7,7 @@ import {
   MapboxStyle,
   HydrantStyle,
   MainStyle,
-  MeterStyle,
+  FixedHeadStyle,
   ValveStyle,
 } from "../../mapstyles";
 import { reprojectFeatureCollection } from "../../utils/reproject";
@@ -50,7 +50,7 @@ const extractAssetType = (
     (feature) =>
       feature.geometry !== null &&
       feature.properties !== null &&
-      types.includes(feature.properties.table)
+      types.includes(feature.properties.category)
   );
 
   return {
@@ -77,17 +77,19 @@ function VectorMap({
     const geoJson = reprojectFeatureCollection(modelGeoJson, projectionString);
 
     return {
-      pipes: extractAssetType(geoJson, ["wn_pipe", "wn_meter", "wn_valve"]),
-      hydrants: extractAssetType(geoJson, ["wn_hydrant"]),
-      valves: extractAssetType(geoJson, ["wn_valve"]),
-      meters: extractAssetType(geoJson, ["wn_meter"]),
+      pipes: extractAssetType(geoJson, ["Pipe", "Valve", "Pump"]),
+      valves: extractAssetType(geoJson, ["Valve"]),
+      pumps: extractAssetType(geoJson, ["Pump"]),
+      junctions: extractAssetType(geoJson, ["Junction"]),
+      tanks: extractAssetType(geoJson, ["Tank"]),
+      reserviors: extractAssetType(geoJson, ["Reservior"]),
     };
   }, [modelGeoJson, projectionString]);
 
   const _addImage = () => {
     if (map) {
-      map.addImage("meter", MeterStyle.toJS().images[0][1]);
       map.addImage("valve", ValveStyle.toJS().images[0][1]);
+      map.addImage("triangleSolid", FixedHeadStyle.toJS().images[0][1]);
 
       // TODO: This is not DRY or where I should be doing this but I
       // need the attribution and I have the map here so ill add now
@@ -127,10 +129,7 @@ function VectorMap({
     return mapStyle;
   }, [projectionString]);
 
-  //TODO: This is a mess, I need to clean this up, there is probably an easy oneliner here I'm not thinking of
   const _onClick = (event: PointerEvent) => {
-    const feature = event.features && event.features[0];
-
     if (
       event &&
       event.features &&
@@ -138,30 +137,7 @@ function VectorMap({
       event.features[0].properties
     ) {
       console.log(event.features[0].toJSON());
-    }
-
-    if (feature) {
-      const {
-        us_node_id,
-        ds_node_id,
-        link_suffix,
-        node_id,
-      } = feature.properties;
-      const feat = modelGeoJson.features.find((f) => {
-        if (f.properties !== null) {
-          if (f.properties.us_node_id !== undefined) {
-            return (
-              f.properties.us_node_id === us_node_id &&
-              f.properties.ds_node_id === ds_node_id &&
-              f.properties.link_suffix === link_suffix
-            );
-          } else {
-            return f.properties.node_id === node_id;
-          }
-        } else return false;
-      });
-
-      feat && onSelectFeature(feat);
+      onSelectFeature(event.features[0].toJSON());
     }
   };
 
@@ -179,24 +155,50 @@ function VectorMap({
       width="100%"
       height="100vh"
       maxZoom={24}
-      interactiveLayerIds={["hydrants-geojson", "main-geojson"]}
+      interactiveLayerIds={["pipes", "junctions", "valves", "reserviors"]}
       clickRadius={2}
     >
-      <Source id="my-data" type="geojson" data={geoJsonSources.pipes}>
+      <Source id="pipe-source" type="geojson" data={geoJsonSources.pipes}>
         <Layer
-          id="main-geojson"
+          id="pipes"
           type="line"
           paint={MainStyle.toJS().paint}
           layout={MainStyle.toJS().layout}
         />
       </Source>
 
-      <Source id="my-data" type="geojson" data={geoJsonSources.hydrants}>
+      <Source
+        id="junction-source"
+        type="geojson"
+        data={geoJsonSources.junctions}
+      >
         <Layer
-          id="hydrants-geojson"
+          id="junctions"
           type="circle"
           paint={HydrantStyle.toJS().paint}
           layout={HydrantStyle.toJS().layout}
+        />
+      </Source>
+
+      <Source id="valve-source" type="geojson" data={geoJsonSources.valves}>
+        <Layer
+          id="valves"
+          type="symbol"
+          paint={{}}
+          layout={ValveStyle.toJS().layout}
+        />
+      </Source>
+
+      <Source
+        id="reservior-source"
+        type="geojson"
+        data={geoJsonSources.reserviors}
+      >
+        <Layer
+          id="reserviors"
+          type="symbol"
+          paint={FixedHeadStyle.toJS().paint}
+          layout={FixedHeadStyle.toJS().layout}
         />
       </Source>
     </ReactMapGL>
