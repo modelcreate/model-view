@@ -106,6 +106,9 @@ function VectorMap({
     interactionState: ExtraState,
     oldViewState: ViewportProps
   ) => {
+    if (projectionString !== "METERS") {
+      return setViewport(viewState);
+    }
     const [minLng, minLat, maxLng, maxLat] = geoJson.viewportBoundingBox;
     const { latitude, longitude } = viewState;
 
@@ -265,39 +268,40 @@ function VectorMap({
           layout={FixedHeadStyle.toJS().layout}
         />
       </Source>
-
-      <Source
-        id="bbox"
-        type="geojson"
-        //@ts-ignore
-        data={geoJson.bboxPoly}
-      >
-        <Layer
-          id="bbox"
-          type="line"
-          paint={MainStyle.toJS().paint}
-          layout={MainStyle.toJS().layout}
-        />
-      </Source>
-
-      <Source
-        id="viewport"
-        type="geojson"
-        //@ts-ignore
-        data={{
-          type: "Feature",
-          geometry: {
-            type: "Point",
-            coordinates: [viewport.longitude, viewport.latitude],
-          },
-        }}
-      >
-        <Layer
-          id="viewport"
-          type="circle"
-          paint={{ "circle-color": "black", "circle-radius": 5 }}
-        />
-      </Source>
+      {
+        //      <Source
+        //        id="bbox"
+        //        type="geojson"
+        //        //@ts-ignore
+        //        data={geoJson.bboxPoly}
+        //      >
+        //        <Layer
+        //          id="bbox"
+        //          type="line"
+        //          paint={MainStyle.toJS().paint}
+        //          layout={MainStyle.toJS().layout}
+        //        />
+        //      </Source>
+        //
+        //      <Source
+        //        id="viewport"
+        //        type="geojson"
+        //        //@ts-ignore
+        //        data={{
+        //          type: "Feature",
+        //          geometry: {
+        //            type: "Point",
+        //            coordinates: [viewport.longitude, viewport.latitude],
+        //          },
+        //        }}
+        //      >
+        //        <Layer
+        //          id="viewport"
+        //          type="circle"
+        //          paint={{ "circle-color": "black", "circle-radius": 5 }}
+        //        />
+        //      </Source>
+      }
     </ReactMapGL>
   );
 }
