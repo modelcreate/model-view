@@ -104,18 +104,6 @@ const useStyles = makeStyles({
   },
 });
 
-// TODO: This is a waste of resources, we should make this ajax plus structured correctly...
-const OPTIONS = proj4List
-  .map((v) => v.label)
-  .sort((a: string, b: string) =>
-    a.toUpperCase().localeCompare(b.toUpperCase())
-  );
-
-const LOOKUP = proj4List.reduce((acc, label) => {
-  acc[label.label] = label.value;
-  return acc;
-}, {} as { [id: string]: string });
-
 const renderGroup = (params: AutocompleteRenderGroupParams) => [
   <ListSubheader key={params.key} component="div">
     {params.group}
@@ -124,7 +112,7 @@ const renderGroup = (params: AutocompleteRenderGroupParams) => [
 ];
 
 function SelectProjection({ onSelectProj }: SelectProjectionProps) {
-  const [value, setValue] = useState<string | null>(null);
+  const [value, setValue] = useState<string | undefined>(undefined);
   const classes = useStyles();
 
   return (
@@ -147,15 +135,18 @@ function SelectProjection({ onSelectProj }: SelectProjectionProps) {
           >
         }
         renderGroup={renderGroup}
-        onInputChange={(event, newInputValue) => {
-          setValue(newInputValue);
+        onChange={(event, newInputValue) => {
+          console.log(newInputValue?.value);
+          setValue(newInputValue?.value);
         }}
-        options={OPTIONS}
-        groupBy={(option) => option[0].toUpperCase()}
+        options={proj4List}
+        getOptionLabel={(option) => option.label}
         renderInput={(params) => (
-          <TextField {...params} variant="outlined" label="Model Project" />
+          <TextField {...params} variant="outlined" label="Model Projection" />
         )}
-        renderOption={(option) => <Typography noWrap>{option}</Typography>}
+        renderOption={(option) => (
+          <Typography noWrap>{option.label}</Typography>
+        )}
       />
 
       {value && (
@@ -164,7 +155,7 @@ function SelectProjection({ onSelectProj }: SelectProjectionProps) {
             variant="contained"
             color="primary"
             onClick={() => {
-              onSelectProj(LOOKUP[value]);
+              onSelectProj(value);
             }}
           >
             View Model
