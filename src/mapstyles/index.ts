@@ -5,6 +5,8 @@ import HydrantStyle from "./water/hydrant";
 import MainStyle from "./water/main";
 import MeterStyle from "./water/meter";
 import ValveStyle from "./water/valve";
+import FixedHeadStyle from "./water/fixedhead";
+import TankStyle from "./water/tank";
 
 export {
   BlankMap,
@@ -13,5 +15,7 @@ export {
   MainStyle,
   MeterStyle,
   ValveStyle,
-  MapboxStyle
+  FixedHeadStyle,
+  TankStyle,
+  MapboxStyle,
 };

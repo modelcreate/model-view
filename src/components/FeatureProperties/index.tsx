@@ -14,10 +14,14 @@ const FeatureProperties: FunctionComponent<FeatureProperties> = ({
   feature,
   tsv,
   selectedFeature,
-  onClearSelected
+  onClearSelected,
 }) => {
   //const selectId = Object.keys(selectedFeature).find(key => selectedFeature[key].constructor === Array)
   const [timeSeriesId, setTimeSeriesId] = useState(tsv[0]);
+
+  if (selectedFeature[timeSeriesId] === undefined) {
+    setTimeSeriesId(tsv[0]);
+  }
 
   const precise = (x: number): string => {
     return x < 0 ? x.toPrecision(2) : x.toFixed(2).toString();
@@ -30,21 +34,23 @@ const FeatureProperties: FunctionComponent<FeatureProperties> = ({
       <button className={"close-button"} onClick={onClearSelected}>
         X
       </button>
-      {
+      {selectedFeature[timeSeriesId] && (
         <TimeSeriesChart
           timeseriesData={selectedFeature[timeSeriesId]}
           currentTimestep={feature.currentTimestep}
-          timesteps={feature.timesteps}
+          startTime={feature.reportingInfo.StartTime}
+          reportStep={feature.reportingInfo.ReportStep}
+          periods={feature.reportingInfo.Periods}
         />
-      }
+      )}
       <form className="tvd-form">
         <label>Plot Data: </label>
         <select
           id="timeseries-select"
           value={timeSeriesId}
-          onChange={evt => setTimeSeriesId(evt.target.value)}
+          onChange={(evt) => setTimeSeriesId(evt.target.value)}
         >
-          {tsv.map(keyName => (
+          {tsv.map((keyName) => (
             <option key={keyName} value={keyName}>
               {keyName}
             </option>

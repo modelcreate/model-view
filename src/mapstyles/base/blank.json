@@ -10,10 +10,7 @@
       "ios": "4.6.0"
     }
   },
-  "center": [
-    -1.464858786792547,
-    50.939150779110975
-  ],
+  "center": [-1.464858786792547, 50.939150779110975],
   "zoom": 13.12365211904204,
   "bearing": -0.44200633613297663,
   "pitch": 0,
@@ -23,6 +20,7 @@
   },
   "sprite": "mapbox://sprites/mapbox/basic-v8",
   "glyphs": "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
+  "sources": {},
   "layers": [
     {
       "id": "background",

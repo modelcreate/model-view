@@ -1,7 +1,9 @@
 import React, { FunctionComponent } from "react";
 import { Properties } from "@turf/helpers";
 import FeatureProperties from "../FeatureProperties";
+import { ReportingInfo } from "../../utils/epanet";
 import format from "date-fns/format";
+import addSeconds from "date-fns/addSeconds";
 import "./index.css";
 
 type DefaultContainer = {};
@@ -13,7 +15,7 @@ const DefaultContainer: FunctionComponent<DefaultContainer> = ({
 export interface ModelInfoSetting {
   modeName: string;
   currentTimestep: number;
-  timesteps: Date[];
+  reportingInfo: ReportingInfo;
   selectedFeature: Properties;
 }
 
@@ -28,19 +30,27 @@ const ModelInfo: FunctionComponent<ModelInfoProps> = ({
   onChange,
   onClearSelected,
 }) => {
+  const currentSecond =
+    settings.reportingInfo.StartTime +
+    settings.currentTimestep * settings.reportingInfo.ReportStep;
+
+  const day = Math.floor(currentSecond / 86400) + 1;
+  const hour = Math.floor((currentSecond % 86400) / 3600);
+  const min = Math.floor((currentSecond % 3600) / 60);
+
   return (
     <DefaultContainer>
       <div className="time-controls">
-        <h2>
-          {format(settings.timesteps[settings.currentTimestep], "Do MMMM yy")}
-        </h2>
-        <h1>{format(settings.timesteps[settings.currentTimestep], "HH:mm")}</h1>
+        <h2>Day {day}</h2>
+        <h1>
+          {hour.toString().padStart(2, "0")}:{min.toString().padStart(2, "0")}
+        </h1>
         <div className="input">
           <input
             type="range"
             value={settings.currentTimestep}
             min={0}
-            max={settings.timesteps.length - 1}
+            max={settings.reportingInfo.Periods - 1}
             step={1}
             onChange={(evt) => onChange(evt.target.value)}
           />

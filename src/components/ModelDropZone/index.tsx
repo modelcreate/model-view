@@ -1,9 +1,9 @@
 import { useDropzone } from "react-dropzone";
 import React, { useMemo, useCallback, FunctionComponent } from "react";
-import { runEpanet } from "../../utils/epanet";
+import { runEpanet, ReportingInfo } from "../../utils/epanet";
 import { EpanetResults } from "../../utils/EpanetBinary";
 
-import ModelFeatureCollection from "../../interfaces/ModelFeatureCollection";
+import EpanetGeoJSON from "../../interfaces/EpanetGeoJSON";
 
 const overlayStyle = {
   position: "absolute",
@@ -14,36 +14,36 @@ const overlayStyle = {
   padding: "2.5em 0",
   background: "rgba(0,0,0,0.5)",
   textAlign: "center",
-  color: "#fff"
+  color: "#fff",
 } as React.CSSProperties;
 
 const baseStyle = {
-  position: "relative"
+  position: "relative",
 } as React.CSSProperties;
 
 const activeStyle = {
   borderStyle: "solid",
   borderColor: "#6c6",
-  backgroundColor: "#eee"
+  backgroundColor: "#eee",
 };
 
 const acceptStyle = {
   borderStyle: "solid",
-  borderColor: "#00e676"
+  borderColor: "#00e676",
 };
 
 const rejectStyle = {
   borderStyle: "solid",
-  borderColor: "#ff1744"
+  borderColor: "#ff1744",
 };
 
 type ModelDropZone = {
-  onDroppedJson: (file: [ModelFeatureCollection, EpanetResults]) => void;
+  onDroppedJson: (file: [EpanetGeoJSON, EpanetResults, ReportingInfo]) => void;
 };
 
 const ModelDropZone: FunctionComponent<ModelDropZone> = ({
   onDroppedJson,
-  children
+  children,
 }) => {
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
@@ -65,11 +65,11 @@ const ModelDropZone: FunctionComponent<ModelDropZone> = ({
     getRootProps,
     isDragActive,
     isDragAccept,
-    isDragReject
+    isDragReject,
   } = useDropzone({
     accept: ["application/json", ""],
     multiple: false,
-    onDrop
+    onDrop,
   });
 
   const style = useMemo(
@@ -77,7 +77,7 @@ const ModelDropZone: FunctionComponent<ModelDropZone> = ({
       ...baseStyle,
       ...(isDragActive ? activeStyle : {}),
       ...(isDragAccept ? acceptStyle : {}),
-      ...(isDragReject ? rejectStyle : {})
+      ...(isDragReject ? rejectStyle : {}),
     }),
     [isDragActive, isDragAccept, isDragReject]
   );

@@ -1,122 +1,94 @@
 import { featureCollection, feature, Feature } from "@turf/helpers";
 import { EpanetResults } from "../EpanetBinary";
 
-import ModelFeatureCollection from "../../interfaces/ModelFeatureCollection";
+import EpanetGeoJSON, {
+  NodeFeature,
+  LinkFeature,
+  Junction,
+  Tank,
+  Reservior,
+  Pipe,
+  Valve,
+  Pump,
+  EpanetFeature,
+} from "../../interfaces/EpanetGeoJSON";
+import { link } from "fs";
 
-interface Node {
-  objType: string;
-  table: string;
-  node_id: string;
-  x: number;
-  y: number;
-  z: number;
-  index: number;
-  profile?: string;
+interface NodeLookup {
+  [id: string]: NodeFeature;
 }
 
-interface Tank {
-  objType: string;
-  table: string;
-  node_id: string;
-  x: number;
-  y: number;
-  z: number;
-  InitLvl: number;
-  MinLvl: number;
-  MaxLvl: number;
-  Diam: number;
-  MinVol: number;
-  VolCurve: string;
-  index: number;
-}
-
-interface Pump {
-  objType: string;
-  table: string;
-  us_node_id: string;
-  ds_node_id: string;
-  link_suffix: string;
-  index: number;
-  bends?: number[][];
-}
-
-interface Pipe extends Link {
-  length: number;
-  roughness: number;
-  status: string;
-}
-
-interface Valve extends Link {
-  type: string;
-  setting: number;
-}
-
-interface Link {
-  objType: string;
-  table: string;
-  us_node_id: string;
-  ds_node_id: string;
-  link_suffix: string;
-  diameter?: number;
-  minorLoss?: number;
-  index: number;
-  bends?: number[][];
-}
-
-interface Nodes {
-  [id: string]: Node | Tank;
-}
-
-interface Links {
-  [id: string]: Pipe | Valve | Pump;
+interface LinkLookup {
+  [id: string]: LinkFeature;
 }
 
 interface EpanetData {
   nodeIndex: number;
   linkIndex: number;
   currentFunction: string;
-  nodes: Nodes;
-  links: Links;
+  errors: string[];
+  nodes: NodeLookup;
+  links: LinkLookup;
 }
 
-export function toGeoJson(
-  inpFile: string,
-  epanetResults: EpanetResults
-): ModelFeatureCollection {
+export function toGeoJson(inpFile: string): EpanetGeoJSON {
   const epanetData: EpanetData = {
     currentFunction: "",
     nodeIndex: 0,
     linkIndex: 0,
+    errors: [],
     nodes: {},
-    links: {}
+    links: {},
   };
 
   const lines = inpFile.split("\n");
   const data = lines.reduce((previousValue, currentValue, currentIndex) => {
-    return readLine(previousValue, currentValue);
+    return readLine(previousValue, currentValue, currentIndex);
   }, epanetData);
 
-  const nodeFeatures = Object.values(data.nodes).reduce(
-    (previousValue, currentValue, currentIndex) => {
-      return previousValue.concat(pointFeature(currentValue));
-    },
-    [] as Feature[]
-  );
+  //  const nodeFeatures = Object.values(data.nodes).reduce(
+  //    (previousValue, currentValue, currentIndex) => {
+  //      return previousValue.concat(pointFeature(currentValue));
+  //    },
+  //    [] as NodeLookup[]
+  //  );
+  //
+  //  const linkFeatures = Object.values(data.links).reduce(
+  //    (previousValue, currentValue, currentIndex) => {
+  //      return previousValue.concat(lineFeature(currentValue, data));
+  //    },
+  //    [] as LinkLookup[]
+  //  );
 
-  const linkFeatures = Object.values(data.links).reduce(
-    (previousValue, currentValue, currentIndex) => {
-      return previousValue.concat(lineFeature(currentValue, data));
-    },
-    [] as Feature[]
-  );
+  //  const fc = featureCollection(nodeFeatures.concat(linkFeatures));
+  //  console.log(fc);
 
-  const fc = featureCollection(nodeFeatures.concat(linkFeatures));
-  console.log(fc);
-  const model: ModelFeatureCollection = {
-    ...fc,
-    model: {
-      timesteps: createTimeSteps(epanetResults.prolog.reportingPeriods)
-    }
+  const links = (Object.keys(data.links) as Array<keyof LinkLookup>).reduce(
+    (acc, l) => {
+      const link = data.links[l];
+      const { usNodeId, dsNodeId } = link.properties;
+      const usGeometry = data.nodes[usNodeId].geometry.coordinates;
+      const dsGeometry = data.nodes[dsNodeId].geometry.coordinates;
+
+      return acc.concat({
+        ...link,
+        geometry: {
+          ...link.geometry,
+          coordinates: [usGeometry, ...link.geometry.coordinates, dsGeometry],
+        },
+      });
+    },
+    [] as LinkFeature[]
+  );
+  console.log(links);
+
+  if (data.errors.length > 0) {
+    console.log(data.errors);
+  }
+
+  const model: EpanetGeoJSON = {
+    type: "FeatureCollection",
+    features: [...links, ...Object.values(data.nodes)],
   };
 
   return model;
@@ -124,9 +96,19 @@ export function toGeoJson(
 
 function readLine(
   epanetData: EpanetData,
-  unTrimmedCurrentLine: string
+  unTrimmedCurrentLine: string,
+  lineNumber: number
 ): EpanetData {
-  const currLine = unTrimmedCurrentLine.replace(/\s+/g, " ").trim();
+  // Removing comments from string and any extra spacing/tabs
+  // From:  "J-1952A	   311.450000	   ; Comment"
+  // To:    "J-1952A 311.450000"
+  const commentStart = unTrimmedCurrentLine.indexOf(";");
+  const trimTo =
+    commentStart === -1 ? unTrimmedCurrentLine.length : commentStart;
+  const currLine = unTrimmedCurrentLine
+    .substring(0, trimTo)
+    .replace(/\s+/g, " ")
+    .trim();
 
   // if line starts with ; or is blank skip
   if (currLine[0] === ";" || currLine[0] === "" || currLine[0] === undefined) {
@@ -141,220 +123,410 @@ function readLine(
 
   switch (epanetData.currentFunction) {
     case "[JUNCTIONS]":
-      return junctions(epanetData, currLine);
+      return junctions(epanetData, currLine, lineNumber);
     case "[RESERVOIRS]":
-      return reservoirs(epanetData, currLine);
+      return reservoirs(epanetData, currLine, lineNumber);
     case "[PIPES]":
-      return pipes(epanetData, currLine);
+      return pipes(epanetData, currLine, lineNumber);
     case "[VALVES]":
-      return valves(epanetData, currLine);
+      return valves(epanetData, currLine, lineNumber);
     case "[COORDINATES]":
-      return coordinates(epanetData, currLine);
+      return coordinates(epanetData, currLine, lineNumber);
     case "[VERTICES]":
-      return vertices(epanetData, currLine);
+      return vertices(epanetData, currLine, lineNumber);
     case "[PUMPS]":
-      return pumps(epanetData, currLine);
+      return pumps(epanetData, currLine, lineNumber);
     case "[TANKS]":
-      return tanks(epanetData, currLine);
+      return tanks(epanetData, currLine, lineNumber);
     default:
       return epanetData;
   }
 }
 
-function pointFeature(node: Node): Feature {
-  const geometry = {
-    type: "Point",
-    coordinates: [node.x, node.y]
-  };
+//function pointFeature(node: Node): NodeFeature {
+//  const geometry = {
+//    type: "Point",
+//    coordinates: [node.x, node.y],
+//  };
+//
+//  const props = {
+//    ...node,
+//  };
+//
+//  const test: NodeFeature = {
+//    type: "Feature",
+//    id: node.index,
+//    properties: {},
+//  };
+//
+//  return feature(geometry, props);
+//}
+//
+//function lineFeature(link: Link, epanetData: EpanetData): LinkFeature {
+//  const us = [
+//    epanetData.nodes[link.us_node_id].x,
+//    epanetData.nodes[link.us_node_id].y,
+//  ];
+//  const ds = [
+//    epanetData.nodes[link.ds_node_id].x,
+//    epanetData.nodes[link.ds_node_id].y,
+//  ];
+//
+//  const bends = link.bends
+//    ? [us].concat(link.bends).concat([ds])
+//    : [us].concat([ds]);
+//
+//  const geometry = {
+//    type: "LineString",
+//    coordinates: bends,
+//  };
+//
+//  const props = {
+//    ...link,
+//  };
+//
+//  delete props.bends;
+//
+//  return feature(geometry, props);
+//}
 
-  const props = {
-    ...node
-  };
-
-  return feature(geometry, props);
-}
-
-function lineFeature(link: Link, epanetData: EpanetData): Feature {
-  const us = [
-    epanetData.nodes[link.us_node_id].x,
-    epanetData.nodes[link.us_node_id].y
-  ];
-  const ds = [
-    epanetData.nodes[link.ds_node_id].x,
-    epanetData.nodes[link.ds_node_id].y
-  ];
-
-  const bends = link.bends
-    ? [us].concat(link.bends).concat([ds])
-    : [us].concat([ds]);
-
-  const geometry = {
-    type: "LineString",
-    coordinates: bends
-  };
-
-  const props = {
-    ...link
-  };
-
-  delete props.bends;
-
-  return feature(geometry, props);
-}
-
-function junctions(epanetData: EpanetData, currLine: string): EpanetData {
+function junctions(
+  epanetData: EpanetData,
+  currLine: string,
+  lineNumber: number
+): EpanetData {
   const data = currLine.split(" ");
+  if (data.length < 2 || data.length > 4) {
+    return {
+      ...epanetData,
+      errors: epanetData.errors.concat(`Error Reading Line ${lineNumber}`),
+    };
+  }
+  const [id] = data;
+
+  const junction: Junction = {
+    type: "Feature",
+    id: epanetData.nodeIndex,
+    geometry: {
+      type: "Point",
+      coordinates: [0, 0],
+    },
+    properties: {
+      type: "Node",
+      category: "Junction",
+      id,
+      elevation: parseFloat(data[1]),
+      demand: parseFloat(data[2]),
+      pattern: data[3],
+    },
+  };
+
+  return {
+    ...epanetData,
+    nodes: {
+      ...epanetData.nodes,
+      [id]: junction,
+    },
+    nodeIndex: epanetData.nodeIndex + 1,
+  };
+}
+
+function reservoirs(
+  epanetData: EpanetData,
+  currLine: string,
+  lineNumber: number
+): EpanetData {
+  const data = currLine.split(" ");
+  if (data.length < 2 || data.length > 3) {
+    return {
+      ...epanetData,
+      errors: epanetData.errors.concat(`Error Reading Line ${lineNumber}`),
+    };
+  }
+  const [id] = data;
+
+  const reservior: Reservior = {
+    type: "Feature",
+    id: epanetData.nodeIndex,
+    geometry: {
+      type: "Point",
+      coordinates: [0, 0],
+    },
+    properties: {
+      type: "Node",
+      category: "Reservior",
+      id,
+      head: parseFloat(data[1]),
+      pattern: data[2],
+    },
+  };
+
+  return {
+    ...epanetData,
+    nodes: {
+      ...epanetData.nodes,
+      [id]: reservior,
+    },
+    nodeIndex: epanetData.nodeIndex + 1,
+  };
+}
+
+function tanks(
+  epanetData: EpanetData,
+  currLine: string,
+  lineNumber: number
+): EpanetData {
+  const data = currLine.split(" ");
+  if (data.length < 7 || data.length > 8) {
+    return {
+      ...epanetData,
+      errors: epanetData.errors.concat(`Error Reading Line ${lineNumber}`),
+    };
+  }
+
+  const [id] = data;
+
+  const tank: Tank = {
+    type: "Feature",
+    id: epanetData.nodeIndex,
+    geometry: {
+      type: "Point",
+      coordinates: [0, 0],
+    },
+    properties: {
+      type: "Node",
+      category: "Tank",
+      id,
+      elevation: parseFloat(data[1]),
+      initLevel: parseFloat(data[2]),
+      minLevel: parseFloat(data[3]),
+      maxLevel: parseFloat(data[4]),
+      diameter: parseFloat(data[5]),
+      minVolume: parseFloat(data[6]),
+      volCurve: data[7],
+      overflow: data[8] ? data[8].toLowerCase() === "true" : undefined,
+    },
+  };
+
+  return {
+    ...epanetData,
+    nodes: {
+      ...epanetData.nodes,
+      [id]: tank,
+    },
+    nodeIndex: epanetData.nodeIndex + 1,
+  };
+}
+
+function pipes(
+  epanetData: EpanetData,
+  currLine: string,
+  lineNumber: number
+): EpanetData {
+  const data = currLine.split(" ");
+  if (data.length < 6 || data.length > 8) {
+    return {
+      ...epanetData,
+      errors: epanetData.errors.concat(`Error Reading Line ${lineNumber}`),
+    };
+  }
+
+  const [
+    id,
+    usNodeId,
+    dsNodeId,
+    length,
+    diameter,
+    roughness,
+    minorLoss,
+    statusAsString,
+  ] = data;
+
+  let status: "Open" | "Closed" | "CV" | undefined = undefined;
+
+  switch (statusAsString && statusAsString.toLowerCase()) {
+    case "open":
+      status = "Open";
+      break;
+
+    case "closed":
+      status = "Closed";
+      break;
+
+    case "cv":
+      status = "CV";
+      break;
+
+    default:
+      break;
+  }
+
+  const pipe: Pipe = {
+    type: "Feature",
+    id: epanetData.linkIndex,
+    geometry: {
+      type: "LineString",
+      coordinates: [],
+    },
+    properties: {
+      type: "Link",
+      category: "Pipe",
+      id,
+      usNodeId,
+      dsNodeId,
+      length: parseFloat(length),
+      diameter: parseFloat(diameter),
+      roughness: parseFloat(roughness),
+      minorLoss: parseFloat(minorLoss),
+      status,
+    },
+  };
+
+  return {
+    ...epanetData,
+    links: {
+      ...epanetData.links,
+      [id]: pipe,
+    },
+    linkIndex: epanetData.linkIndex + 1,
+  };
+}
+
+function pumps(
+  epanetData: EpanetData,
+  currLine: string,
+  lineNumber: number
+): EpanetData {
+  const data = currLine.split(" ");
+  if (
+    data.length < 5 ||
+    data.length === 6 ||
+    data.length === 8 ||
+    data.length > 9
+  ) {
+    return {
+      ...epanetData,
+      errors: epanetData.errors.concat(`Error Reading Line ${lineNumber}`),
+    };
+  }
+
+  const [id, usNodeId, dsNodeId] = data;
+
+  const pump: Pump = {
+    type: "Feature",
+    id: epanetData.linkIndex,
+    geometry: {
+      type: "LineString",
+      coordinates: [],
+    },
+    properties: {
+      type: "Link",
+      category: "Pump",
+      id,
+      usNodeId,
+      dsNodeId,
+      mode: "Power",
+      power: 2,
+      speed: 1,
+      pattern: "dummy",
+    },
+  };
+
+  return {
+    ...epanetData,
+    links: {
+      ...epanetData.links,
+      [id]: pump,
+    },
+    linkIndex: epanetData.linkIndex + 1,
+  };
+}
+
+function valves(
+  epanetData: EpanetData,
+  currLine: string,
+  lineNumber: number
+): EpanetData {
+  const data = currLine.split(" ");
+
+  const [id, usNodeId, dsNodeId] = data;
+
+  const valve: Valve = {
+    type: "Feature",
+    id: epanetData.linkIndex,
+    geometry: {
+      type: "LineString",
+      coordinates: [],
+    },
+    properties: {
+      type: "Link",
+      category: "Valve",
+      id,
+      usNodeId,
+      dsNodeId,
+      diameter: 100,
+      valveType: "TCV",
+      setting: 100,
+      minorLoss: 0,
+    },
+  };
+
+  return {
+    ...epanetData,
+    links: {
+      ...epanetData.links,
+      [id]: valve,
+    },
+    linkIndex: epanetData.linkIndex + 1,
+  };
+}
+
+function coordinates(
+  epanetData: EpanetData,
+  currLine: string,
+  lineNumber: number
+): EpanetData {
+  const data = currLine.split(" ");
+  if (epanetData.nodes[data[0]] === undefined) {
+    debugger;
+  }
+
+  const node = epanetData.nodes[data[0]];
+  const x = parseFloat(data[1]);
+  const y = parseFloat(data[2]);
 
   epanetData.nodes[data[0]] = {
-    objType: "junction",
-    table: "wn_hydrant",
-    node_id: data[0],
-    x: 0,
-    y: 0,
-    z: parseFloat(data[1]),
-    index: epanetData.nodeIndex
-  };
-
-  epanetData.nodeIndex++;
-
-  return epanetData;
-}
-
-function reservoirs(epanetData: EpanetData, currLine: string): EpanetData {
-  const data = currLine.split(" ");
-
-  epanetData.nodes[data[0]] = {
-    objType: "reservoir",
-    table: "wn_hydrant",
-    node_id: data[0],
-    x: 0,
-    y: 0,
-    z: parseFloat(data[1]),
-    profile: data[2],
-    index: epanetData.nodeIndex
-  };
-
-  epanetData.nodeIndex++;
-
-  return epanetData;
-}
-
-function tanks(epanetData: EpanetData, currLine: string): EpanetData {
-  const data = currLine.split(" ");
-
-  epanetData.nodes[data[0]] = {
-    objType: "tank",
-    table: "wn_tank",
-    node_id: data[0],
-    x: 0,
-    y: 0,
-    z: parseFloat(data[1]),
-    InitLvl: parseFloat(data[2]),
-    MinLvl: parseFloat(data[3]),
-    MaxLvl: parseFloat(data[4]),
-    Diam: parseFloat(data[5]),
-    MinVol: parseFloat(data[6]),
-    VolCurve: data[7],
-    index: epanetData.nodeIndex
-  };
-
-  epanetData.nodeIndex++;
-
-  return epanetData;
-}
-
-function pipes(epanetData: EpanetData, currLine: string): EpanetData {
-  const data = currLine.split(" ");
-
-  epanetData.links[data[0]] = {
-    objType: "pipe",
-    table: "wn_pipe",
-    us_node_id: data[1],
-    ds_node_id: data[2],
-    link_suffix: "1",
-    length: parseFloat(data[3]),
-    diameter: parseFloat(data[4]),
-    roughness: parseFloat(data[5]),
-    minorLoss: parseFloat(data[6]),
-    status: data[7],
-    index: epanetData.linkIndex
-  };
-
-  epanetData.linkIndex++;
-
-  return epanetData;
-}
-
-function pumps(epanetData: EpanetData, currLine: string): EpanetData {
-  const data = currLine.split(" ");
-
-  epanetData.links[data[0]] = {
-    objType: "pump",
-    table: "wn_pumping_station",
-    us_node_id: data[1],
-    ds_node_id: data[2],
-    link_suffix: "1",
-    index: epanetData.linkIndex
-  };
-
-  epanetData.linkIndex++;
-
-  return epanetData;
-}
-
-function valves(epanetData: EpanetData, currLine: string): EpanetData {
-  const data = currLine.split(" ");
-
-  epanetData.links[data[0]] = {
-    objType: "valve",
-    table: "wn_valve",
-    us_node_id: data[1],
-    ds_node_id: data[2],
-    link_suffix: "1",
-    diameter: parseFloat(data[3]),
-    type: data[4],
-    setting: parseFloat(data[6]),
-    minorLoss: parseFloat(data[7]),
-    index: epanetData.linkIndex
-  };
-
-  epanetData.linkIndex++;
-
-  return epanetData;
-}
-
-function coordinates(epanetData: EpanetData, currLine: string): EpanetData {
-  const data = currLine.split(" ");
-
-  epanetData.nodes[data[0]] = {
-    ...epanetData.nodes[data[0]],
-    x: parseFloat(data[1]),
-    y: parseFloat(data[2])
+    ...node,
+    geometry: {
+      ...node.geometry,
+      coordinates: [x, y],
+    },
   };
 
   return epanetData;
 }
 
-function vertices(epanetData: EpanetData, currLine: string): EpanetData {
+function vertices(
+  epanetData: EpanetData,
+  currLine: string,
+  lineNumber: number
+): EpanetData {
   const data = currLine.split(" ");
 
-  const existingBends = epanetData.links[data[0]].bends;
+  const link = epanetData.links[data[0]];
+
+  const existingBends = link.geometry.coordinates;
   const newBend = [parseFloat(data[1]), parseFloat(data[2])];
 
   const bends = existingBends ? existingBends.concat([newBend]) : [newBend];
 
   epanetData.links[data[0]] = {
-    ...epanetData.links[data[0]],
-    bends
+    ...link,
+    geometry: {
+      ...link.geometry,
+      coordinates: bends,
+    },
   };
 
   return epanetData;
-}
-
-function createTimeSteps(periods: number): string[] {
-  const dateObj = new Date(2019, 0, 0);
-
-  return [...Array(periods)].map((_, i) => {
-    return new Date(dateObj.getTime() + i * 900000).toISOString();
-  });
 }

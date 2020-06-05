@@ -1,24 +1,30 @@
 import React, { FunctionComponent } from "react";
-import { VictoryChart, VictoryLine } from "victory";
+import { VictoryChart, VictoryLine, VictoryAxis, VictoryTheme } from "victory";
 
 type TimeSeriesChartProps = {
   timeseriesData: number[];
-  timesteps: Date[];
+  startTime: number;
+  reportStep: number;
+  periods: number;
   currentTimestep: number;
 };
 
 const TimeSeriesChart: FunctionComponent<TimeSeriesChartProps> = ({
   timeseriesData,
-  timesteps,
-  currentTimestep
+  startTime,
+  reportStep,
+  periods,
+  currentTimestep,
 }) => {
+  const currentSecond = startTime + currentTimestep * reportStep;
+
   const avgData =
     timeseriesData.reduce((p, c) => p + c, 0) / timeseriesData.length;
   const multipler = avgData >= 0 ? 1 : -1;
 
-  const data = timesteps.map((timestep, i) => ({
-    x: timestep,
-    y: timeseriesData[i] * multipler
+  const data = timeseriesData.map((data, i) => ({
+    x: startTime + reportStep * i,
+    y: data * multipler,
   }));
   const max = Math.max(...timeseriesData);
   const min = Math.min(...timeseriesData);
@@ -30,30 +36,61 @@ const TimeSeriesChart: FunctionComponent<TimeSeriesChartProps> = ({
     return x < 0 ? x.toPrecision(2) : x.toFixed(2).toString();
   };
 
+  const getTickFormat = (t: number): string => {
+    if (t % 86400 === 0) {
+      return `Day ${t / 86400 + 1}`;
+    }
+    const hour = Math.floor((t % 86400) / 3600);
+    const minute = Math.floor((t % 3600) / 60);
+
+    return `${hour.toString().padStart(2, "0")}:${minute
+      .toString()
+      .padStart(2, "0")}`;
+  };
+
+  const ticks = Array.from(Array(periods).keys()).reduce((acc, i) => {
+    const tickInt = periods * reportStep > 86400 * 2 ? 86400 : 21600;
+
+    const time = startTime + reportStep * i;
+    if (time === 0 || time % tickInt === 0) {
+      return acc.concat(time);
+    }
+    return acc;
+  }, [] as number[]);
+
   return (
     <div>
       <VictoryChart
-        domain={{
-          y: [domainMin - diff * 0.1, domainMax + diff * 0.1]
-        }}
+        maxDomain={{ y: domainMax + diff * 0.1 }}
+        minDomain={{ y: domainMin - diff * 0.1 }}
         width={500}
         height={180}
-        scale={{ x: "time" }}
       >
+        <VictoryAxis
+          crossAxis
+          theme={VictoryTheme.material}
+          tickFormat={(t) => getTickFormat(t)}
+          tickValues={ticks}
+        />
+        <VictoryAxis dependentAxis crossAxis theme={VictoryTheme.material} />
         <VictoryLine
           style={{
-            data: { stroke: "tomato" }
+            data: { stroke: "tomato" },
           }}
-          x={() => timesteps[currentTimestep].getTime()}
+          x={() => currentSecond} //timesteps[currentTimestep].getTime()}
         />
         <VictoryLine
           data={data}
-          labels={(d: { x: Date; y: number }) =>
-            timesteps[currentTimestep] === d.x ? precise(d.y) : null
+          labels={({ datum }) =>
+            currentSecond === datum.x ? precise(datum.y) : null
           }
+          //labels={(d: { x: number; y: number }) => {
+          //  console.log(d);
+          //  return currentSecond === d.x ? precise(d.y) : null;
+          //}}
           style={{
             data: { stroke: "#1528f7" },
-            labels: { fill: "#00000", fontSize: 20, textAnchor: "start" }
+            labels: { fill: "#00000", fontSize: 20, textAnchor: "start" },
           }}
         />
       </VictoryChart>
