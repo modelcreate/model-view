@@ -1,8 +1,15 @@
-import { Project, Workspace } from "epanet-js";
+import { Project, Workspace, TimeParameter } from "epanet-js";
 import { readBinary, EpanetResults } from "../EpanetBinary";
 import { toGeoJson } from "../EpanetToGeojson";
 
 import EpanetGeoJSON from "../../interfaces/EpanetGeoJSON";
+
+export interface ReportingInfo {
+  Periods: number;
+  ReportStep: number;
+  StartTime: number;
+  Duration: number;
+}
 
 // convert inp to geojson
 // run epanet
@@ -11,7 +18,7 @@ import EpanetGeoJSON from "../../interfaces/EpanetGeoJSON";
 
 export function runEpanet(
   fromProject: string,
-  openModel: (file: [EpanetGeoJSON, EpanetResults]) => void
+  openModel: (file: [EpanetGeoJSON, EpanetResults, ReportingInfo]) => void
 ): void {
   // Initialise a new Workspace and Project object
   const ws = new Workspace();
@@ -24,8 +31,17 @@ export function runEpanet(
   model.open("net1.inp", "report.rpt", "out.bin");
   model.solveH();
   model.saveH();
-  model.closeH();
 
+  const keys = ["Periods", "ReportStep", "StartTime", "Duration"] as Array<
+    keyof ReportingInfo
+  >;
+
+  const timeInfo = keys.reduce((acc, k) => {
+    acc[k] = model.getTimeParameter(TimeParameter[k]);
+    return acc;
+  }, {} as ReportingInfo);
+
+  model.closeH();
   model.close();
 
   const resultView = ws.readFile("out.bin", "binary");
@@ -51,6 +67,6 @@ export function runEpanet(
   console.log(results);
   console.log("Call to readBinary took " + (t3 - t2) + " milliseconds.");
 
-  openModel([geoJson, results]);
+  openModel([geoJson, results, timeInfo]);
   //  };
 }

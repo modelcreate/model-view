@@ -38,7 +38,9 @@ const FeatureProperties: FunctionComponent<FeatureProperties> = ({
         <TimeSeriesChart
           timeseriesData={selectedFeature[timeSeriesId]}
           currentTimestep={feature.currentTimestep}
-          timesteps={feature.timesteps}
+          startTime={feature.reportingInfo.StartTime}
+          reportStep={feature.reportingInfo.ReportStep}
+          periods={feature.reportingInfo.Periods}
         />
       )}
       <form className="tvd-form">

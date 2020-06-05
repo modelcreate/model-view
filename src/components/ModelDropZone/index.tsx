@@ -1,6 +1,6 @@
 import { useDropzone } from "react-dropzone";
 import React, { useMemo, useCallback, FunctionComponent } from "react";
-import { runEpanet } from "../../utils/epanet";
+import { runEpanet, ReportingInfo } from "../../utils/epanet";
 import { EpanetResults } from "../../utils/EpanetBinary";
 
 import EpanetGeoJSON from "../../interfaces/EpanetGeoJSON";
@@ -38,7 +38,7 @@ const rejectStyle = {
 };
 
 type ModelDropZone = {
-  onDroppedJson: (file: [EpanetGeoJSON, EpanetResults]) => void;
+  onDroppedJson: (file: [EpanetGeoJSON, EpanetResults, ReportingInfo]) => void;
 };
 
 const ModelDropZone: FunctionComponent<ModelDropZone> = ({
