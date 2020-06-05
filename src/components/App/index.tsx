@@ -161,7 +161,6 @@ class App extends Component<Props, AppState> {
 
   droppedJson = (file: [EpanetGeoJSON, EpanetResults]) => {
     this.setState((prevState) => ({
-      projectionString: "+proj=utm +zone=17 +datum=NAD83 +units=m +no_defs", //Temp set
       isFileLoaded: true,
       modelGeoJson: file[0],
       epanetResults: file[1],

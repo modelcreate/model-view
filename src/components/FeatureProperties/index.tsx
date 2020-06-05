@@ -19,6 +19,10 @@ const FeatureProperties: FunctionComponent<FeatureProperties> = ({
   //const selectId = Object.keys(selectedFeature).find(key => selectedFeature[key].constructor === Array)
   const [timeSeriesId, setTimeSeriesId] = useState(tsv[0]);
 
+  if (selectedFeature[timeSeriesId] === undefined) {
+    setTimeSeriesId(tsv[0]);
+  }
+
   const precise = (x: number): string => {
     return x < 0 ? x.toPrecision(2) : x.toFixed(2).toString();
   };

@@ -1,5 +1,12 @@
 import React, { useState, useMemo } from "react";
-import ReactMapGL, { PointerEvent, Source, Layer } from "react-map-gl";
+import ReactMapGL, {
+  PointerEvent,
+  Source,
+  Layer,
+  WebMercatorViewport,
+  ViewportProps,
+  ExtraState,
+} from "react-map-gl";
 import { fromJS } from "immutable";
 import {
   OsZoomStackLight,
@@ -18,6 +25,9 @@ import {
   Properties,
 } from "@turf/helpers";
 import bbox from "@turf/bbox";
+import bboxPolygon from "@turf/bbox-polygon";
+import length from "@turf/length";
+import buffer from "@turf/buffer";
 import { AttributionControl, Map } from "mapbox-gl";
 import * as GeoJSON from "geojson";
 
@@ -68,23 +78,61 @@ function VectorMap({
   const [viewport, setViewport] = useState({
     width: 400,
     height: 100,
-    latitude: 43.403673421449156,
-    longitude: -80.51306024193764,
-    zoom: 14.2,
+    latitude: 0,
+    longitude: 0,
+    zoom: 1,
   });
 
-  const geoJsonSources = useMemo(() => {
-    const geoJson = reprojectFeatureCollection(modelGeoJson, projectionString);
+  const geoJson = useMemo(() => {
+    const model = reprojectFeatureCollection(modelGeoJson, projectionString);
+    const boundingBox = bbox(model);
+    const bboxPoly = bboxPolygon(boundingBox);
+    const bboxPolyBuffer = buffer(bboxPoly, length(bboxPoly) / 4);
+    const viewportBoundingBox = bbox(bboxPolyBuffer);
 
     return {
-      pipes: extractAssetType(geoJson, ["Pipe", "Valve", "Pump"]),
-      valves: extractAssetType(geoJson, ["Valve"]),
-      pumps: extractAssetType(geoJson, ["Pump"]),
-      junctions: extractAssetType(geoJson, ["Junction"]),
-      tanks: extractAssetType(geoJson, ["Tank"]),
-      reserviors: extractAssetType(geoJson, ["Reservior"]),
+      model,
+      boundingBox,
+      viewportBoundingBox,
+      bboxPoly: {
+        type: "FeatureCollection",
+        features: [bboxPolygon(boundingBox), bboxPolyBuffer],
+      },
     };
   }, [modelGeoJson, projectionString]);
+
+  const onViewPortChange = (
+    viewState: ViewportProps,
+    interactionState: ExtraState,
+    oldViewState: ViewportProps
+  ) => {
+    const [minLng, minLat, maxLng, maxLat] = geoJson.viewportBoundingBox;
+    const { latitude, longitude } = viewState;
+
+    const newLongitude =
+      longitude > maxLng ? maxLng : longitude < minLng ? minLng : longitude;
+    const newLatitude =
+      latitude > maxLat ? maxLat : latitude < minLat ? minLat : latitude;
+
+    setViewport({
+      ...viewState,
+      longitude: newLongitude,
+      latitude: newLatitude,
+    });
+  };
+
+  const geoJsonSources = useMemo(() => {
+    const { model } = geoJson;
+
+    return {
+      pipes: extractAssetType(model, ["Pipe", "Valve", "Pump"]),
+      valves: extractAssetType(model, ["Valve"]),
+      pumps: extractAssetType(model, ["Pump"]),
+      junctions: extractAssetType(model, ["Junction"]),
+      tanks: extractAssetType(model, ["Tank"]),
+      reserviors: extractAssetType(model, ["Reservior"]),
+    };
+  }, [geoJson]);
 
   const _addImage = () => {
     if (map) {
@@ -106,9 +154,25 @@ function VectorMap({
         );
       }
 
-      //const json = this.state.mapStyle.toJS();
-      //const jsonbbox = bbox(json.sources.mains.data);
-      //this._goToBBox(jsonbbox);
+      const geoJson = reprojectFeatureCollection(
+        modelGeoJson,
+        projectionString
+      );
+      const jsonbbox = bbox(geoJson);
+
+      const { longitude, latitude, zoom } = new WebMercatorViewport({
+        width: 400,
+        height: 400,
+      }).fitBounds([
+        [jsonbbox[0], jsonbbox[1]],
+        [jsonbbox[2], jsonbbox[3]],
+      ]);
+      setViewport({
+        ...viewport,
+        longitude,
+        latitude,
+        zoom,
+      });
     }
   };
 
@@ -146,7 +210,7 @@ function VectorMap({
       {...viewport}
       mapStyle={style}
       ref={(ref) => ref && setMap(ref.getMap())}
-      onViewportChange={setViewport}
+      onViewportChange={onViewPortChange}
       onLoad={() => {
         _addImage();
       }}
@@ -199,6 +263,39 @@ function VectorMap({
           type="symbol"
           paint={FixedHeadStyle.toJS().paint}
           layout={FixedHeadStyle.toJS().layout}
+        />
+      </Source>
+
+      <Source
+        id="bbox"
+        type="geojson"
+        //@ts-ignore
+        data={geoJson.bboxPoly}
+      >
+        <Layer
+          id="bbox"
+          type="line"
+          paint={MainStyle.toJS().paint}
+          layout={MainStyle.toJS().layout}
+        />
+      </Source>
+
+      <Source
+        id="viewport"
+        type="geojson"
+        //@ts-ignore
+        data={{
+          type: "Feature",
+          geometry: {
+            type: "Point",
+            coordinates: [viewport.longitude, viewport.latitude],
+          },
+        }}
+      >
+        <Layer
+          id="viewport"
+          type="circle"
+          paint={{ "circle-color": "black", "circle-radius": 5 }}
         />
       </Source>
     </ReactMapGL>
