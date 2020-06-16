@@ -60,7 +60,9 @@ function LayoutLanding() {
         className={classes.appContainer}
         maxWidth={false}
         disableGutters
-      ></Container>
+      >
+        <></>
+      </Container>
     </React.Fragment>
   );
 }

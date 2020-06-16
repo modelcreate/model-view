@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import ModelDropZone from "../ModelDropZone";
 import VectorMap from "../VectorMap";
 import Landing from "../Landing";
 import ModelInfo, { ModelInfoSetting } from "../ModelInfo";
@@ -133,33 +132,31 @@ class App extends Component<Props, AppState> {
     } = this.state;
 
     return (
-      <ModelDropZone onDroppedJson={this.droppedJson}>
-        <div className="App">
-          <header className="App-header">
-            {modelGeoJson && projectionString !== "" ? (
-              <>
-                <VectorMap
-                  projectionString={projectionString}
-                  onSelectFeature={this._updateSelectedFeature}
-                  modelGeoJson={modelGeoJson}
-                />
-                <ModelInfo
-                  settings={setting}
-                  onChange={this._updateSettings}
-                  onClearSelected={this._clearSelectedFeature}
-                />
-              </>
-            ) : (
-              <Landing
-                onLoadDemo={this.loadDemo}
-                isLoading={isLoading}
-                isFileLoaded={isFileLoaded}
-                onSelectProj={this._updateProjectionString}
+      <div className="App">
+        <header className="App-header">
+          {modelGeoJson && projectionString !== "" ? (
+            <>
+              <VectorMap
+                projectionString={projectionString}
+                onSelectFeature={this._updateSelectedFeature}
+                modelGeoJson={modelGeoJson}
               />
-            )}
-          </header>
-        </div>
-      </ModelDropZone>
+              <ModelInfo
+                settings={setting}
+                onChange={this._updateSettings}
+                onClearSelected={this._clearSelectedFeature}
+              />
+            </>
+          ) : (
+            <Landing
+              onLoadDemo={this.loadDemo}
+              isLoading={isLoading}
+              isFileLoaded={isFileLoaded}
+              onSelectProj={this._updateProjectionString}
+            />
+          )}
+        </header>
+      </div>
     );
   }
 }

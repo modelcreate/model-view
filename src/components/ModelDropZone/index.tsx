@@ -1,30 +1,23 @@
 import { useDropzone } from "react-dropzone";
 import React, { useMemo, useCallback, FunctionComponent } from "react";
-import { runEpanet, ReportingInfo } from "../../utils/epanet";
-import { EpanetResults } from "../../utils/EpanetBinary";
-
-import EpanetGeoJSON from "../../interfaces/EpanetGeoJSON";
 
 const overlayStyle = {
   position: "absolute",
+  zIndex: 1400,
   top: 0,
   right: 0,
   bottom: 0,
   left: 0,
-  padding: "2.5em 0",
+  padding: "4em 0",
   background: "rgba(0,0,0,0.5)",
+  fontSize: "4rem",
   textAlign: "center",
   color: "#fff",
-} as React.CSSProperties;
-
-const baseStyle = {
-  position: "relative",
 } as React.CSSProperties;
 
 const activeStyle = {
   borderStyle: "solid",
   borderColor: "#6c6",
-  backgroundColor: "#eee",
 };
 
 const acceptStyle = {
@@ -38,11 +31,11 @@ const rejectStyle = {
 };
 
 type ModelDropZone = {
-  onDroppedJson: (file: [EpanetGeoJSON, EpanetResults, ReportingInfo]) => void;
+  onDroppedInpFile: (file: string) => void;
 };
 
 const ModelDropZone: FunctionComponent<ModelDropZone> = ({
-  onDroppedJson,
+  onDroppedInpFile,
   children,
 }) => {
   const onDrop = useCallback(
@@ -51,14 +44,14 @@ const ModelDropZone: FunctionComponent<ModelDropZone> = ({
         const reader = new FileReader();
         reader.onload = () => {
           if (typeof reader.result === "string") {
-            runEpanet(reader.result, onDroppedJson);
+            onDroppedInpFile(reader.result);
           }
         };
 
         reader.readAsText(acceptedFiles[0]);
       }
     },
-    [onDroppedJson]
+    [onDroppedInpFile]
   );
 
   const {
@@ -74,7 +67,7 @@ const ModelDropZone: FunctionComponent<ModelDropZone> = ({
 
   const style = useMemo(
     () => ({
-      ...baseStyle,
+      ...overlayStyle,
       ...(isDragActive ? activeStyle : {}),
       ...(isDragAccept ? acceptStyle : {}),
       ...(isDragReject ? rejectStyle : {}),
@@ -83,8 +76,8 @@ const ModelDropZone: FunctionComponent<ModelDropZone> = ({
   );
 
   return (
-    <div {...getRootProps({ style })}>
-      {isDragActive && <div style={overlayStyle}>Drop files here</div>}
+    <div {...getRootProps({})}>
+      {isDragActive && <div style={style}>Drop file to load model...</div>}
       {children}
     </div>
   );
