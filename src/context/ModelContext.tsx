@@ -6,9 +6,13 @@ type Props = {
   children: React.ReactNode;
 };
 
+type LayoutState = "SELECTMODEL" | "SETTINGS" | "RUNNINGMODEL" | "MODELLOADED";
+
 type ModelContextType = {
+  layoutState: LayoutState;
   epanetGeoJSON: EpanetGeoJSON | undefined;
   openInpFile: (inpFile: string) => void;
+  setLayoutState: (state: LayoutState) => void;
 };
 
 const ModelContext = createContext<ModelContextType | undefined>(undefined);
@@ -19,6 +23,8 @@ export function ModelProvider({ children }: Props) {
   const [epanetGeoJSON, setEpanetGeoJSON] = useState<EpanetGeoJSON | undefined>(
     undefined
   );
+
+  const [layoutState, setLayoutState] = useState<LayoutState>("SELECTMODEL");
 
   const openInpFile = (inpFile: string) => {
     console.log("running openInpFile");
@@ -33,8 +39,10 @@ export function ModelProvider({ children }: Props) {
   return (
     <ModelContext.Provider
       value={{
+        layoutState,
         epanetGeoJSON,
         openInpFile,
+        setLayoutState,
       }}
     >
       {children}

@@ -2,7 +2,7 @@ import React from "react";
 
 import { ThemeProvider } from "@material-ui/core";
 import CssBaseline from "@material-ui/core/CssBaseline";
-import Layout from "../LayoutLanding";
+import Layout from "../Layout";
 import ModelDropZone from "../ModelDropZone";
 import useModel from "../../hooks/useModel";
 import { createTheme } from "../../theme";

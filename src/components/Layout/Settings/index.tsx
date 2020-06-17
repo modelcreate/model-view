@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import Typography from "@material-ui/core/Typography";
+import SelectProjection from "../../SelectProjection";
 
 import { makeStyles } from "@material-ui/core/styles";
 
@@ -13,25 +14,27 @@ const useStyles = makeStyles((theme) => ({
     margin: "30px 50px",
     color: "rgb(110, 110, 110)",
   },
+  button: {
+    margin: theme.spacing(1),
+  },
 }));
 
-function Droptarget() {
+function Settings() {
   const classes = useStyles();
 
-  const test = () => {
-    console.log("clicked");
-  };
+  const [value, setValue] = useState<string | undefined>(undefined);
 
   return (
-    <div className={classes.droparea} onClick={test}>
+    <>
       <Typography variant="body1" gutterBottom>
-        Drop INP file here or click to choose a file.
+        Settings Tab
       </Typography>
       <Typography variant="body1" gutterBottom>
-        Models are ran locally and no data is uploaded to the server.
+        {value}
       </Typography>
-    </div>
+      <SelectProjection onSelectProj={setValue} />
+    </>
   );
 }
 
-export default Droptarget;
+export default Settings;

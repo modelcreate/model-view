@@ -1,13 +1,16 @@
 import React from "react";
 
 import Title from "./Title";
-import Droptarget from "./Droptarget";
-import Actions from "./Actions";
-
+import SelectModel from "./SelectModel";
+import RunModel from "./RunModel";
+import Settings from "./Settings";
+import ModelInfo from "./ModelInfo";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import Drawer from "@material-ui/core/Drawer";
-import Typography from "@material-ui/core/Typography";
+import Button from "@material-ui/core/Button";
+
+import useModel from "../../hooks/useModel";
 
 const drawerWidth = 550;
 
@@ -36,8 +39,17 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function LayoutLanding() {
+const PANEL_LAYOUT = {
+  SELECTMODEL: <SelectModel />,
+  SETTINGS: <Settings />,
+  RUNNINGMODEL: <RunModel />,
+  MODELLOADED: <ModelInfo />,
+};
+
+function Layout() {
   const classes = useStyles();
+
+  const { layoutState, setLayoutState } = useModel()!;
 
   return (
     <React.Fragment>
@@ -51,10 +63,43 @@ function LayoutLanding() {
         anchor="left"
       >
         <Container className={classes.sideBarContainer} maxWidth={false}>
-          <Title />
-          <Droptarget />
-          <Actions />
+          <Title topPadding={layoutState === "SELECTMODEL"} />
+          {PANEL_LAYOUT[layoutState]}
         </Container>
+
+        <Button
+          variant="contained"
+          onClick={() => {
+            setLayoutState("SELECTMODEL");
+          }}
+        >
+          Select Model
+        </Button>
+
+        <Button
+          variant="contained"
+          onClick={() => {
+            setLayoutState("SETTINGS");
+          }}
+        >
+          SETTINGS
+        </Button>
+        <Button
+          variant="contained"
+          onClick={() => {
+            setLayoutState("RUNNINGMODEL");
+          }}
+        >
+          RUNNINGMODEL
+        </Button>
+        <Button
+          variant="contained"
+          onClick={() => {
+            setLayoutState("MODELLOADED");
+          }}
+        >
+          MODELLOADED
+        </Button>
       </Drawer>
       <Container
         className={classes.appContainer}
@@ -67,4 +112,4 @@ function LayoutLanding() {
   );
 }
 
-export default LayoutLanding;
+export default Layout;
